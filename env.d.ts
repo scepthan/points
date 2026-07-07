@@ -1,1 +1,1 @@
-declare module "@mdi/font/css/materialdesignicons.css";
+/// <reference types="vite/client" />
