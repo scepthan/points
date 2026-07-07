@@ -3,6 +3,7 @@ import Vue from "@vitejs/plugin-vue";
 import AutoImport from "unplugin-auto-import/vite";
 import ViteFonts from "unplugin-fonts/vite";
 import Components from "unplugin-vue-components/vite";
+import { createHtmlPlugin } from "vite-plugin-html";
 import Vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 
 // Utilities
@@ -30,6 +31,10 @@ export default defineConfig({
     }),
     AutoImport({
       imports: ["vue", "vue-router"],
+    }),
+    createHtmlPlugin({
+      minify: false,
+      entry: "src/main.ts",
     }),
   ],
   define: { "process.env": {} },
