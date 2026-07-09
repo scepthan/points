@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/vue-query";
-import { GetPointsStandingsEndpoint } from "../endpoints";
+import { GetDriverStandingsEndpoint } from "../endpoints";
 
-export const useGetPointsStandingsQuery = (series: number) => {
-  const queryKey = ["standings", series];
-  const fetch = async () => await GetPointsStandingsEndpoint(series);
+export const useGetDriverStandingsQuery = (series: number) => {
+  const queryKey = ["driver_standings", series];
+  const fetch = async () => await GetDriverStandingsEndpoint(series);
 
   const { data, isPending, isError } = useQuery({
     queryKey: queryKey,

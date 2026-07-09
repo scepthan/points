@@ -1,4 +1,4 @@
-export interface PointsStandingsEntry {
+export interface DriverStandingsEntry {
   car_no: string;
   delta_leader: number;
   delta_playoff: number;

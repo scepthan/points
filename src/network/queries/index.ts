@@ -1,1 +1,1 @@
-export * from "./useGetPointsStandingsQuery";
+export * from "./useGetDriverStandingsQuery";

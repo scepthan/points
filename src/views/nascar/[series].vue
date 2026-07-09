@@ -43,11 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { useGetPointsStandingsQuery } from "@/network/queries";
+import { useGetDriverStandingsQuery } from "@/network/queries";
 import { RouterLink } from "vue-router";
 
 const route = useRoute();
 const series = computed(() => Number(route.params.series));
-const query = useGetPointsStandingsQuery(series.value);
+const query = useGetDriverStandingsQuery(series.value);
 const entries = computed(() => query.entries.value ?? []);
 </script>

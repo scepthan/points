@@ -1,1 +1,1 @@
-export * from "./GetPointsStandingsEndpoint";
+export * from "./GetDriverStandingsEndpoint";
