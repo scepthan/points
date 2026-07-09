@@ -13,6 +13,7 @@
     "lint": "eslint --fix ."
   },
   "dependencies": {
+    "@fontsource/oxanium": "^5.2.8",
     "@mdi/font": "7.4.47",
     "@tanstack/vue-query": "^5.101.2",
     "pinia": "^3.0.3",

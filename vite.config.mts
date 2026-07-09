@@ -16,14 +16,16 @@ export default defineConfig({
       template: { transformAssetUrls },
     }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
-    Vuetify(),
+    Vuetify({
+      styles: { configFile: "src/styles/settings.scss" },
+    }),
     Components(),
     ViteFonts({
-      google: {
+      fontsource: {
         families: [
           {
-            name: "Roboto",
-            styles: "wght@100;300;400;500;700;900",
+            name: "Oxanium",
+            weights: [200, 300, 400, 500, 600, 700, 800],
           },
         ],
       },

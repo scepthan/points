@@ -26,9 +26,10 @@
     </template>
   </v-data-table>
 
-  <v-row no-gutters class="mt-2">
-    <v-col cols="3" class="pa-3 playoff-impossible">Mathematically eliminated from Chase</v-col>
-    <v-col cols="3" class="pa-3 playoff-ineligible">Ineligible for Chase</v-col>
+  <v-row no-gutters class="mt-2 legend">
+    <v-col cols="3" class="playoff-impossible">Mathematically eliminated from Chase</v-col>
+    <v-col cols="3" class="playoff-ineligible">Ineligible for Chase</v-col>
+    <v-col cols="3" class="playoff-clinched">Mathematically clinched Chase spot</v-col>
   </v-row>
 </template>
 
@@ -85,5 +86,13 @@ div.playoff-impossible {
 :deep(.playoff-ineligible td),
 div.playoff-ineligible {
   background-color: #512800 !important;
+}
+:deep(.playoff-clinched td),
+div.playoff-clinched {
+  background-color: #0d4800 !important;
+}
+
+.legend div {
+  padding: 12px;
 }
 </style>
