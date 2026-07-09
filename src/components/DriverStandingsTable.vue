@@ -9,6 +9,7 @@
       { title: 'Points', value: 'points' },
       { title: 'Behind', value: 'delta_leader' },
     ]"
+    :row-props="(item) => ({ class: item.item.position == playoffCutoff ? 'playoff-cutoff' : '' })"
     :items-per-page="-1"
     hide-default-footer
   >
@@ -21,8 +22,27 @@
 <script setup lang="ts">
 import type { DriverStandingsEntry } from "@/types";
 
-defineProps<{
+const props = defineProps<{
   series: number;
   entries: DriverStandingsEntry[];
 }>();
+
+const playoffCutoff = computed(() => {
+  switch (props.series) {
+    case 1:
+      return 16;
+    case 2:
+      return 12;
+    case 3:
+      return 10;
+    default:
+      return 0;
+  }
+});
 </script>
+
+<style scoped>
+:deep(.playoff-cutoff td) {
+  border-bottom: 2px solid #ff2108 !important;
+}
+</style>

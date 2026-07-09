@@ -1,1 +1,1 @@
-export * from "./standings";
+export * from "./DriverStandingsEntry";
