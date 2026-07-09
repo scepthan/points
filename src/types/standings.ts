@@ -1,0 +1,32 @@
+export interface PointsStandingsEntry {
+  car_no: string;
+  delta_leader: number;
+  delta_playoff: number;
+  dnf: number;
+  driver_first_name: string;
+  driver_id: number;
+  driver_last_name: string;
+  driver_name: string;
+  driver_suffix: string;
+  is_clinch: number;
+  laps_led: number;
+  manufacturer: string;
+  playoff_eligible: number;
+  playoff_points: number;
+  playoff_race_wins: number;
+  playoff_rank: number;
+  playoff_stage_wins: number;
+  points: number;
+  points_earned: number;
+  poles: number;
+  position: number;
+  projected_playoff_points: number;
+  stage_1_wins: number;
+  stage_2_wins: number;
+  stage_3_wins: number;
+  stage_points: number;
+  starts: number;
+  top_10: number;
+  top_5: number;
+  wins: number;
+}

@@ -7,11 +7,12 @@
 // Plugins
 import pinia from "./pinia";
 import router from "./router";
+import tanstack from "./tanstack";
 import vuetify from "./vuetify";
 
 // Types
 import type { App } from "vue";
 
 export function registerPlugins(app: App) {
-  app.use(vuetify).use(pinia).use(router);
+  app.use(vuetify).use(pinia).use(router).use(tanstack);
 }

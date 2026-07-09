@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
+    "@tanstack/vue-query": "^5.101.2",
     "pinia": "^3.0.3",
     "roboto-fontface": "*",
+    "tanstack": "^2.0.3",
     "vue": "^3.5.21",
     "vue-router": "^5.1.0",
     "vuetify": "^4.1.4"
