@@ -1,19 +1,39 @@
 <template>
   <v-container>
-    <router-link :to="{ name: 'home' }"> <v-icon>mdi-arrow-left</v-icon> Back to home </router-link>
+    <div class="my-2">
+      <router-link :to="{ name: 'home' }">
+        <v-icon>mdi-arrow-left</v-icon> Back to home
+      </router-link>
+    </div>
     <div v-if="entries.length > 0">
-      <v-row v-for="(entry, i) in entries" :key="entry.driver_id">
-        <v-col>
-          <h2>{{ i + 1 }}. {{ entry.driver_name }}</h2>
-          <p>Points: {{ entry.points }}</p>
-        </v-col>
-      </v-row>
+      <v-data-table
+        :items="entries"
+        :headers="[
+          { title: 'Pos', value: 'position' },
+          { title: 'Driver', value: 'driver_name' },
+          { title: 'Num', value: 'car_no' },
+          { title: 'Mfr', value: 'manufacturer' },
+          { title: 'Points', value: 'points' },
+          { title: 'Behind', value: 'delta_leader' },
+        ]"
+        :items-per-page="-1"
+        hide-default-footer
+      >
+        <template v-slot:item.car_no="{ item }">
+          <v-img
+            :src="`https://cf.nascar.com/data/images/carbadges/${series}/${item.car_no}.png`"
+            :alt="`Car badge for #${item.car_no}`"
+            width="40"
+            height="40"
+          />
+        </template>
+      </v-data-table>
     </div>
     <div v-else>
       <v-row>
         <v-col>
           <p v-if="query.isError.value">
-            Error loading points standings for series ID {{ route.params.series }}.
+            Error loading points standings for series ID {{ series }}.
           </p>
           <p v-else>Loading...</p>
         </v-col>
@@ -27,6 +47,7 @@ import { useGetPointsStandingsQuery } from "@/network/queries";
 import { RouterLink } from "vue-router";
 
 const route = useRoute();
-const query = useGetPointsStandingsQuery(Number(route.params.series));
+const series = computed(() => Number(route.params.series));
+const query = useGetPointsStandingsQuery(series.value);
 const entries = computed(() => query.entries.value ?? []);
 </script>
