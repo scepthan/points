@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "NASCAR Cup Series",
+    "regular_season_races": 26,
+    "playoff_races": 10,
+    "playoff_spots": 16
+  },
+  {
+    "id": 2,
+    "name": "NASCAR O'Reilly Auto Parts Series",
+    "regular_season_races": 24,
+    "playoff_races": 9,
+    "playoff_spots": 12
+  },
+  {
+    "id": 3,
+    "name": "NASCAR Craftsman Truck Series",
+    "regular_season_races": 18,
+    "playoff_races": 7,
+    "playoff_spots": 10
+  }
+]
