@@ -1,24 +1,20 @@
 <template>
-  <v-container v-if="entries.length > 0">
-    <v-row v-for="(entry, i) in entries" :key="entry.driver_id">
-      <v-col>
-        <h2>{{ i + 1 }}. {{ entry.driver_name }}</h2>
-        <p>Points: {{ entry.points }}</p>
-      </v-col>
-    </v-row>
-  </v-container>
-  <v-container v-else>
-    <v-row>
-      <v-col>
-        <p>Loading...</p>
-      </v-col>
-    </v-row>
+  <v-container>
+    <h2>Points standings</h2>
+    <v-list>
+      <v-list-item>
+        <RouterLink :to="{ name: 'nascar', params: { series: 1 } }"> NASCAR Cup Series </RouterLink>
+      </v-list-item>
+      <v-list-item>
+        <RouterLink :to="{ name: 'nascar', params: { series: 2 } }">
+          NASCAR O'Reilly Auto Parts Series
+        </RouterLink>
+      </v-list-item>
+      <v-list-item>
+        <RouterLink :to="{ name: 'nascar', params: { series: 3 } }">
+          NASCAR Craftsman Truck Series
+        </RouterLink>
+      </v-list-item>
+    </v-list>
   </v-container>
 </template>
-
-<script setup lang="ts">
-import { useGetPointsStandingsQuery } from "@/network/queries";
-
-const query = useGetPointsStandingsQuery(1);
-const entries = computed(() => query.entries.value ?? []);
-</script>

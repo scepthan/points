@@ -5,7 +5,7 @@ export const useGetPointsStandingsQuery = (series: number) => {
   const queryKey = ["standings", series];
   const fetch = async () => await GetPointsStandingsEndpoint(series);
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: queryKey,
     queryFn: fetch,
     staleTime: 1000 * 60 * 5,
@@ -14,5 +14,6 @@ export const useGetPointsStandingsQuery = (series: number) => {
   return {
     entries: data,
     isPending,
+    isError,
   };
 };
