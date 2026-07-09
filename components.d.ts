@@ -11,6 +11,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CarBadge: typeof import('./src/components/CarBadge.vue')['default']
+    DriverStandingsTable: typeof import('./src/components/DriverStandingsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

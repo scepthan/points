@@ -5,39 +5,13 @@
         <v-icon>mdi-arrow-left</v-icon> Back to home
       </router-link>
     </div>
+
     <div v-if="entries.length > 0">
-      <v-data-table
-        :items="entries"
-        :headers="[
-          { title: 'Pos', value: 'position' },
-          { title: 'Driver', value: 'driver_name' },
-          { title: 'Num', value: 'car_no' },
-          { title: 'Mfr', value: 'manufacturer' },
-          { title: 'Points', value: 'points' },
-          { title: 'Behind', value: 'delta_leader' },
-        ]"
-        :items-per-page="-1"
-        hide-default-footer
-      >
-        <template v-slot:item.car_no="{ item }">
-          <v-img
-            :src="`https://cf.nascar.com/data/images/carbadges/${series}/${item.car_no}.png`"
-            :alt="`Car badge for #${item.car_no}`"
-            width="40"
-            height="40"
-          />
-        </template>
-      </v-data-table>
+      <DriverStandingsTable :series="series" :entries="entries" />
     </div>
     <div v-else>
-      <v-row>
-        <v-col>
-          <p v-if="query.isError.value">
-            Error loading points standings for series ID {{ series }}.
-          </p>
-          <p v-else>Loading...</p>
-        </v-col>
-      </v-row>
+      <p v-if="query.isError.value">Error loading points standings for series ID {{ series }}.</p>
+      <p v-else>Loading...</p>
     </div>
   </v-container>
 </template>
