@@ -15,7 +15,7 @@
           >{{ seriesInfo.regular_season_races - racesCompleted }} races until Chase</span
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
-      <DriverStandingsTable :series="seriesInfo" :entries="entries" />
+      <DriverStandingsTable :series="seriesInfo" :entries="entries" :season="standingsYear" />
     </div>
     <div v-else>
       <p v-if="query.isError.value">Error loading points standings for series ID {{ seriesId }}.</p>

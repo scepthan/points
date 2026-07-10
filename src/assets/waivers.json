@@ -1,0 +1,14 @@
+[
+  {
+    "year": 2026,
+    "driver_name": "Alex Bowman",
+    "series_id": 1,
+    "reason": "illness"
+  },
+  {
+    "year": 2026,
+    "driver_name": "Brent Crews",
+    "series_id": 2,
+    "reason": "age restriction"
+  }
+]
