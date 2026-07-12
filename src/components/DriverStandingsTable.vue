@@ -6,8 +6,9 @@
       { title: 'Num', value: 'car_no' },
       { title: 'Driver', value: 'driver_last_name' },
       { title: 'Points', value: 'points' },
-      { title: 'Behind', value: 'delta_leader' },
-      { title: 'Points to Clinch', value: 'playoffPointsToClinch' },
+      { title: 'Cutline', value: 'pointsToCutline' },
+      { title: 'Leader', value: 'delta_leader' },
+      { title: 'To Clinch', value: 'playoffPointsToClinch' },
       { title: 'Starts', value: 'starts' },
       { title: 'Wins', value: 'wins' },
       { title: 'DNFs', value: 'dnf' },
@@ -25,6 +26,16 @@
         <span class="text-label-medium text-medium-emphasis">{{ item.driver_first_name }}</span>
         <span class="text-title-medium mt-n1">{{ item.driver_last_name }}</span>
       </div>
+    </template>
+
+    <template v-slot:item.pointsToCutline="{ item }">
+      <span v-if="item.position <= (series?.playoff_spots ?? 0)">+{{ item.pointsToCutline }}</span>
+      <span v-else>&minus;{{ Math.abs(item.pointsToCutline) }}</span>
+    </template>
+
+    <template v-slot:item.delta_leader="{ item }">
+      <span v-if="item.delta_leader === 0">0</span>
+      <span v-else>&minus;{{ Math.abs(item.delta_leader) }}</span>
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">

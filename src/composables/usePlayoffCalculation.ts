@@ -4,6 +4,7 @@ import { useCurrentSeason } from "./useCurrentSeason";
 export type PlayoffCalculationEntry = DriverStandingsEntry & {
   playoffEligible: boolean;
   playoffPossible: boolean;
+  pointsToCutline: number;
   playoffClinched: boolean;
   playoffPointsToClinch: number | null;
   playoffDriversBeatenToClinch: number | null;
@@ -47,6 +48,9 @@ export const usePlayoffCalculation = (
   for (const driver of standings) {
     const playoffEligible = eligibleDrivers.includes(driver);
     const playoffPossible = driver.points + racesRemaining * 76 >= cutoffPoints;
+    const pointsToCutline =
+      driver.points -
+      (driver.position > playoffSpots ? cutoffPoints : standings[playoffSpots].points);
     let playoffClinched = false;
     let playoffPointsToClinch: number | null = null;
     let playoffDriversBeatenToClinch: number | null = null;
@@ -81,6 +85,7 @@ export const usePlayoffCalculation = (
       Object.assign({}, driver, {
         playoffEligible,
         playoffPossible,
+        pointsToCutline,
         playoffClinched,
         playoffPointsToClinch,
         playoffDriversBeatenToClinch,
