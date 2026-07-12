@@ -27,13 +27,19 @@
       </div>
     </template>
 
+    <template v-slot:item.playoffPointsToClinch="{ item }">
+      <span v-if="item.playoffPointsToClinch === null">&ndash;</span>
+      <span v-else-if="item.playoffPointsToClinch <= 0">Clinched</span>
+      <span v-else>{{ item.playoffPointsToClinch }}</span>
+    </template>
+
     <template v-slot:item.starts="{ item }">
       <StartsDisplay :entry="item" />
     </template>
   </v-data-table>
 
   <v-row no-gutters class="mt-2 legend">
-    <v-col v-for="entry in legendEntries" :key="entry.class" cols="4" md="3" :class="entry.class">
+    <v-col v-for="entry in legendEntries" :key="entry.class" cols="6" md="3" :class="entry.class">
       {{ entry.text }}
     </v-col>
   </v-row>
@@ -65,14 +71,17 @@ const playoffCutoffClass = (driver: PlayoffCalculationEntry) => {
     classes.push("playoff-ineligible");
   } else if (driver.playoffClinched) {
     classes.push("playoff-clinched");
+  } else if (driver.playoffPointsToClinch !== null && driver.playoffPointsToClinch <= 76) {
+    classes.push("playoff-clinchable");
   }
   return { class: classes };
 };
 
 const legendEntries = [
-  { class: "playoff-impossible", text: "Mathematically eliminated from Chase" },
-  { class: "playoff-ineligible", text: "Ineligible for Chase" },
   { class: "playoff-clinched", text: "Mathematically clinched Chase spot" },
+  { class: "playoff-clinchable", text: "Can mathematically clinch Chase spot next race" },
+  { class: "playoff-ineligible", text: "Ineligible for Chase" },
+  { class: "playoff-impossible", text: "Mathematically eliminated from Chase" },
 ];
 </script>
 
@@ -95,6 +104,10 @@ const legendEntries = [
 :deep(.playoff-clinched td),
 :deep(div.playoff-clinched) {
   background-color: #0d4800 !important;
+}
+:deep(.playoff-clinchable td),
+:deep(div.playoff-clinchable) {
+  background-color: #002838 !important;
 }
 
 .legend div {
