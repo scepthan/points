@@ -49,7 +49,7 @@ const tooltipText = computed(() => {
   const driverCountText =
     driversToClinch === 1
       ? `driver currently in ${lowPosition}`
-      : `${driversToClinch} ${driverWithinPositions ? "other " : ""} drivers from ${highPosition} to ${lowPosition}`;
+      : `${driversToClinch} ${driverWithinPositions ? "other " : ""} drivers currently in ${highPosition} to ${lowPosition}`;
   const allText = driversToClinch === 1 ? "" : " all";
 
   if (props.driver.playoffClinched) {
