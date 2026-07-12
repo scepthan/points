@@ -71,6 +71,7 @@ export const usePlayoffCalculation = (
           playoffDriversBeatenToClinch = i;
           if (driver.points >= highestPossibleCutoff) {
             playoffClinched = true;
+            break;
           }
         }
       }

@@ -28,9 +28,7 @@
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">
-      <span v-if="item.playoffPointsToClinch === null">&ndash;</span>
-      <span v-else-if="item.playoffPointsToClinch <= 0">Clinched</span>
-      <span v-else>{{ item.playoffPointsToClinch }}</span>
+      <PointsToClinchDisplay :driver="item" />
     </template>
 
     <template v-slot:item.starts="{ item }">
