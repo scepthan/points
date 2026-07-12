@@ -15,7 +15,7 @@
           >{{ seriesInfo.regular_season_races - racesCompleted }} races until Chase</span
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
-      <DriverStandingsTable :series="seriesInfo" :entries="entries" :season="standingsYear" />
+      <DriverStandingsTable :entries="entries" />
     </div>
     <div v-else>
       <p v-if="query.isError.value">Error loading points standings for series ID {{ seriesId }}.</p>
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { allSeries } from "@/assets";
+import { useCurrentSeason } from "@/composables";
 import { useGetDriverStandingsQuery } from "@/network/queries";
 
 const route = useRoute();
@@ -47,4 +48,13 @@ const standingsYear = computed(() => {
   }
   return currentYear;
 });
+
+const currentSeason = useCurrentSeason();
+const updateCurrentSeason = () => {
+  currentSeason.series.value = seriesInfo.value ?? null;
+  currentSeason.season.value = standingsYear.value;
+  currentSeason.racesCompleted.value = racesCompleted.value;
+};
+updateCurrentSeason();
+watch([seriesInfo, standingsYear, racesCompleted], updateCurrentSeason);
 </script>

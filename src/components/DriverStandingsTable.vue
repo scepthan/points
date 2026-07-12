@@ -16,7 +16,7 @@
     hide-default-footer
   >
     <template v-slot:item.car_no="{ item }">
-      <CarBadge :series="series.id" :number="item.car_no" />
+      <CarBadge :number="item.car_no" />
     </template>
 
     <template v-slot:item.driver_last_name="{ item }">
@@ -27,12 +27,7 @@
     </template>
 
     <template v-slot:item.starts="{ item }">
-      <StartsDisplay
-        :entry="item"
-        :series-id="series.id"
-        :season="season"
-        :races-completed="racesCompleted"
-      />
+      <StartsDisplay :entry="item" />
     </template>
   </v-data-table>
 
@@ -44,23 +39,22 @@
 </template>
 
 <script setup lang="ts">
-import { getDriverWaiver } from "@/assets";
+import { useCurrentSeason } from "@/composables";
 import type { DriverStandingsEntry } from "@/types";
-import type { SeriesInfo } from "@/types/SeriesInfo";
 
 const props = defineProps<{
-  series: SeriesInfo;
   entries: DriverStandingsEntry[];
-  season: number;
 }>();
 
-const racesCompleted = computed(() => Math.max(...props.entries.map((entry) => entry.starts)));
+const { racesCompleted, season, series, getDriverWaiver } = useCurrentSeason();
 
 const playoffCutoffClass = (driver: DriverStandingsEntry) => {
+  if (series.value === null || racesCompleted.value === null) return {};
+
   const classes = [];
-  if (driver.position === props.series.playoff_spots) {
+  if (driver.position === series.value.playoff_spots) {
     classes.push(
-      racesCompleted.value < props.series.regular_season_races
+      racesCompleted.value < series.value.regular_season_races
         ? "playoff-cutoff-upcoming"
         : "playoff-cutoff",
     );
@@ -73,14 +67,19 @@ const playoffCutoffClass = (driver: DriverStandingsEntry) => {
   return { class: classes };
 };
 
-const isPlayoffEligible = (driver: DriverStandingsEntry) =>
-  driver.starts === racesCompleted.value ||
-  getDriverWaiver(driver, props.series.id, props.season) !== undefined;
+const isPlayoffEligible = (driver: DriverStandingsEntry) => {
+  if (series.value === null || racesCompleted.value === null) return true;
+  if (driver.starts === racesCompleted.value) return true;
+  return getDriverWaiver(driver) !== undefined;
+};
 
-const isPlayoffPossible = (driver: DriverStandingsEntry) =>
-  driver.points + (props.series.regular_season_races - racesCompleted.value) * 75 >=
-  props.entries[props.series.playoff_spots - 1].points;
-
+const isPlayoffPossible = (driver: DriverStandingsEntry) => {
+  if (series.value === null || racesCompleted.value === null) return true;
+  return (
+    driver.points + (series.value.regular_season_races - racesCompleted.value) * 75 >=
+    props.entries[series.value.playoff_spots - 1].points
+  );
+};
 const legendEntries = [
   { class: "playoff-impossible", text: "Mathematically eliminated from Chase" },
   { class: "playoff-ineligible", text: "Ineligible for Chase" },
