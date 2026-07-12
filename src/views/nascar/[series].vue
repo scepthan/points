@@ -26,15 +26,15 @@
 
 <script setup lang="ts">
 import { allSeries } from "@/assets";
-import { useCurrentSeason } from "@/composables";
-import { useGetDriverStandingsQuery } from "@/network/queries";
+import { useCurrentSeason, usePlayoffCalculation } from "@/composables";
+import { useGetDriverStandingsQuery } from "@/network";
 
 const route = useRoute();
 const seriesId = computed(() => Number(route.params.series));
 const seriesInfo = computed(() => allSeries.find((s) => s.id === seriesId.value));
 
 const query = useGetDriverStandingsQuery(seriesId.value);
-const entries = computed(() => query.entries.value ?? []);
+const entries = computed(() => usePlayoffCalculation(query.entries.value ?? []));
 
 const racesCompleted = computed(() => Math.max(...entries.value.map((entry) => entry.starts)));
 const totalRaces = computed(() =>

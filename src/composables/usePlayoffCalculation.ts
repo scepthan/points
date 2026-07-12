@@ -1,0 +1,91 @@
+import type { DriverStandingsEntry } from "@/types";
+import { useCurrentSeason } from "./useCurrentSeason";
+
+export type PlayoffCalculationEntry = DriverStandingsEntry & {
+  playoffEligible: boolean;
+  playoffPossible: boolean;
+  playoffClinched: boolean;
+  playoffPointsToClinch: number | null;
+  playoffDriversBeatenToClinch: number | null;
+};
+
+export const usePlayoffCalculation = (
+  standings: DriverStandingsEntry[],
+): PlayoffCalculationEntry[] => {
+  const currentSeason = useCurrentSeason();
+  const series = currentSeason.series.value;
+  const racesCompleted = currentSeason.racesCompleted.value;
+  if (series === null || racesCompleted === null || standings.length < series.playoff_spots)
+    return [];
+
+  const racesRemaining = series.regular_season_races - racesCompleted;
+
+  const maximumPointsRemaining = (position: number) => {
+    const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
+    const stagePoints = position <= 10 ? 11 - position : 0;
+    const stagesRemaining = racesRemaining * 2; // Will need to account for Coca-Cola 600 eventually
+    return basePoints * racesRemaining + stagePoints * stagesRemaining;
+  };
+
+  const maximumPointsForNDrivers = (driver_count: number) => {
+    let total = 0;
+    for (let i = 0; i < driver_count; i++) {
+      total += maximumPointsRemaining(i + 1);
+    }
+    return total;
+  };
+
+  const playoffSpots = series.playoff_spots;
+  const cutoffPoints = standings[playoffSpots - 1].points;
+
+  const eligibleDrivers = standings.filter(
+    (driver) =>
+      driver.starts === racesCompleted || currentSeason.getDriverWaiver(driver) !== undefined,
+  );
+
+  const calculated = [];
+  for (const driver of standings) {
+    const playoffEligible = eligibleDrivers.includes(driver);
+    const playoffPossible = driver.points + racesRemaining * 76 >= cutoffPoints;
+    let playoffClinched = false;
+    let playoffPointsToClinch: number | null = null;
+    let playoffDriversBeatenToClinch: number | null = null;
+
+    if (playoffEligible && playoffPossible) {
+      const currentPlayoffsWithoutDriver = eligibleDrivers
+        .filter((d) => d !== driver)
+        .slice(0, playoffSpots);
+
+      let lowestHighestPossibleCutoff = Infinity;
+      for (let i = 1; i <= playoffSpots; i++) {
+        const totalLowestDriversPoints = currentPlayoffsWithoutDriver
+          .slice(-i)
+          .reduce((sum, d) => sum + d.points, 0);
+        const maxPointsForOtherDrivers = maximumPointsForNDrivers(i);
+        const highestPossibleCutoff = Math.floor(
+          (totalLowestDriversPoints + maxPointsForOtherDrivers) / i,
+        );
+        if (highestPossibleCutoff < lowestHighestPossibleCutoff) {
+          lowestHighestPossibleCutoff = highestPossibleCutoff;
+          playoffPointsToClinch = highestPossibleCutoff - driver.points;
+          playoffDriversBeatenToClinch = i;
+          if (driver.points >= highestPossibleCutoff) {
+            playoffClinched = true;
+          }
+        }
+      }
+    }
+
+    calculated.push(
+      Object.assign({}, driver, {
+        playoffEligible,
+        playoffPossible,
+        playoffClinched,
+        playoffPointsToClinch,
+        playoffDriversBeatenToClinch,
+      }),
+    );
+  }
+
+  return calculated;
+};
