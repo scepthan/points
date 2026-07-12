@@ -27,27 +27,24 @@
     </template>
 
     <template v-slot:item.starts="{ item }">
-      <v-tooltip
-        v-if="getDriverWaiver(item)"
-        :text="`${item.driver_name} has received a waiver and will be eligible for the Chase despite missing ${racesCompleted - item.starts} races due to ${getDriverWaiver(item)?.reason}`"
-      >
-        <template v-slot:activator="{ props }">
-          <span v-bind="props" class="hover-tooltip">{{ item.starts }}</span>
-        </template>
-      </v-tooltip>
-      <span v-else>{{ item.starts }}</span>
+      <StartsDisplay
+        :entry="item"
+        :series-id="series.id"
+        :season="season"
+        :races-completed="racesCompleted"
+      />
     </template>
   </v-data-table>
 
   <v-row no-gutters class="mt-2 legend">
-    <v-col cols="3" class="playoff-impossible">Mathematically eliminated from Chase</v-col>
-    <v-col cols="3" class="playoff-ineligible">Ineligible for Chase</v-col>
-    <v-col cols="3" class="playoff-clinched">Mathematically clinched Chase spot</v-col>
+    <v-col v-for="entry in legendEntries" :key="entry.class" cols="4" sm="3" :class="entry.class">
+      {{ entry.text }}
+    </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
-import { allWaivers } from "@/assets";
+import { getDriverWaiver } from "@/assets";
 import type { DriverStandingsEntry } from "@/types";
 import type { SeriesInfo } from "@/types/SeriesInfo";
 
@@ -76,20 +73,19 @@ const playoffCutoffClass = (driver: DriverStandingsEntry) => {
   return { class: classes };
 };
 
-const getDriverWaiver = (driver: DriverStandingsEntry) =>
-  allWaivers.find(
-    (waiver) =>
-      waiver.driver_name === driver.driver_name &&
-      waiver.series_id === props.series.id &&
-      waiver.year === props.season,
-  );
-
 const isPlayoffEligible = (driver: DriverStandingsEntry) =>
-  driver.starts === racesCompleted.value || getDriverWaiver(driver) !== undefined;
+  driver.starts === racesCompleted.value ||
+  getDriverWaiver(driver, props.series.id, props.season) !== undefined;
 
 const isPlayoffPossible = (driver: DriverStandingsEntry) =>
   driver.points + (props.series.regular_season_races - racesCompleted.value) * 75 >=
   props.entries[props.series.playoff_spots - 1].points;
+
+const legendEntries = [
+  { class: "playoff-impossible", text: "Mathematically eliminated from Chase" },
+  { class: "playoff-ineligible", text: "Ineligible for Chase" },
+  { class: "playoff-clinched", text: "Mathematically clinched Chase spot" },
+];
 </script>
 
 <style scoped>

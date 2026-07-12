@@ -15,5 +15,6 @@ declare module 'vue' {
     DriverStandingsTable: typeof import('./src/components/DriverStandingsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StartsDisplay: typeof import('./src/components/StartsDisplay.vue')['default']
   }
 }
