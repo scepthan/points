@@ -71,13 +71,13 @@ import {
   usePlayoffCalculation,
   type PlayoffCalculated,
 } from "@/composables";
-import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsInfo } from "@/types";
+import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsEntry } from "@/types";
 
 const props = defineProps<{
   entries: DriverStandingsEntry[];
   projection: boolean;
   liveRaceInfo?: LiveRaceInfo;
-  liveStagePoints?: LiveStagePointsInfo[];
+  liveStagePoints?: LiveStagePointsEntry[];
 }>();
 
 const calculatedEntries = computed(() => {

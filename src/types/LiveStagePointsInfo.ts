@@ -1,4 +1,4 @@
-export interface LiveStagePointsInfo {
+export interface LiveStagePointsEntry {
   race_id: number;
   run_id: number;
   stage_number: number;

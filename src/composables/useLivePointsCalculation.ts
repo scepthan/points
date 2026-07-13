@@ -1,4 +1,4 @@
-import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsInfo } from "@/types";
+import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsEntry } from "@/types";
 
 export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
   previousPoints: number;
@@ -13,7 +13,7 @@ export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
 export const useLivePointsCalculation = (
   entries: DriverStandingsEntry[],
   calcProjection: boolean,
-  liveStagePoints?: LiveStagePointsInfo[],
+  liveStagePoints?: LiveStagePointsEntry[],
   liveRaceInfo?: LiveRaceInfo,
 ): ExpandedDriverStandingsEntry[] => {
   const defaultEntries = entries.map((entry) => ({
