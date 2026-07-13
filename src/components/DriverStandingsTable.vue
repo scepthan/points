@@ -3,6 +3,9 @@
     :items="calculatedEntries"
     :headers="tableHeaders"
     :row-props="(item) => playoffCutoffClass(item.item)"
+    fixed-header
+    height="calc(100vh - 250px)"
+    style="min-height: 580px"
     :items-per-page="-1"
     hide-default-footer
   >
