@@ -1,8 +1,11 @@
 <template>
   <v-container>
-    <div class="my-2">
+    <div class="my-2 d-flex justify-space-between">
       <router-link :to="{ name: 'home' }">
-        <v-icon>mdi-arrow-left</v-icon> Back to home
+        <v-icon class="mb-1">mdi-arrow-left</v-icon> Back to home
+      </router-link>
+      <router-link :to="{ name: 'about' }">
+        <v-icon class="mb-1">mdi-information-outline</v-icon> How does this work?
       </router-link>
     </div>
 
@@ -93,7 +96,6 @@ updateCurrentSeason();
 watch([seriesInfo, standingsYear, racesCompleted], updateCurrentSeason);
 
 const liveRaceQuery = useGetLiveRaceInfoQuery();
-const raceId = ref(liveRaceQuery.liveRaceInfo.value?.race_id ?? 0);
 const currentlyInRace = computed(
   () =>
     liveRaceQuery.liveRaceInfo.value?.series_id === seriesId.value &&
@@ -104,6 +106,7 @@ const currentlyInRace = computed(
 const liveRaceInfo = computed(() =>
   currentlyInRace.value ? liveRaceQuery.liveRaceInfo.value : undefined,
 );
+const raceId = ref(liveRaceInfo.value?.race_id ?? 0);
 
 watch(liveRaceInfo, (newVal) => {
   if (newVal) {
