@@ -13,6 +13,7 @@ export type PlayoffCalculated<T extends DriverStandingsEntry> = T & {
 export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
   standings: T[],
   stagesCompleted?: number,
+  raceCompleted?: boolean,
 ): PlayoffCalculated<T>[] => {
   const currentSeason = useCurrentSeason();
   const series = currentSeason.series.value;
@@ -20,7 +21,7 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
   if (series === null || racesCompleted === null || standings.length < series.playoff_spots)
     return [];
 
-  const racesRemaining = series.regular_season_races - racesCompleted;
+  const racesRemaining = series.regular_season_races - racesCompleted - (raceCompleted ? 1 : 0);
   const stagesRemaining = racesRemaining * 2 - (stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
 
   const maximumPointsRemaining = (position: number) => {

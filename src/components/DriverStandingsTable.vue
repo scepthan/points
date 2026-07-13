@@ -85,7 +85,7 @@ const calculatedEntries = computed(() => {
     props.liveStagePoints,
     props.liveRaceInfo,
   );
-  return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length);
+  return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length, props.projection);
 });
 
 const { racesCompleted, series } = useCurrentSeason();
