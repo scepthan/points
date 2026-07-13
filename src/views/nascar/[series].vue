@@ -18,16 +18,7 @@
           Points earned as of completion of stage {{ stagesComplete }}/3, race
           {{ racesCompleted + 1 }} of {{ totalRaces }}
         </p>
-        <h5 class="my-1">
-          Live: lap {{ liveRaceInfo.lap_number }}/{{ liveRaceInfo.laps_in_race }} (stage
-          {{ liveRaceInfo.stage.stage_num }} lap
-          {{
-            liveRaceInfo.lap_number -
-            (liveRaceInfo.stage.finish_at_lap - liveRaceInfo.stage.laps_in_stage)
-          }}/{{ liveRaceInfo.stage.finish_at_lap - liveRaceInfo.stage.laps_in_stage }});
-          {{ flagState }} at
-          {{ liveRaceInfo.track_name }}
-        </h5>
+        <LiveRaceInfoDisplay :info="liveRaceInfo" />
       </div>
       <p class="mt-n1" v-else>
         After race {{ racesCompleted }} of {{ totalRaces }} (<span
@@ -98,24 +89,6 @@ const liveRaceInfo = computed(() =>
   currentlyInRace.value ? liveRaceQuery.liveRaceInfo.value : undefined,
 );
 
-const flagState = computed(() => {
-  switch (liveRaceInfo.value?.flag_state) {
-    case 1:
-      return "green flag";
-    case 2:
-      return "yellow flag";
-    case 3:
-      return "red flag";
-    case 5:
-      return "warmup";
-    case 8:
-      return "pre-race";
-    case 9:
-      return "checkered flag";
-    default:
-      return "unknown status";
-  }
-});
 watch(liveRaceInfo, (newVal) => {
   if (newVal) {
     raceId.value = newVal.race_id;
