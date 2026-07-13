@@ -22,7 +22,7 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
     return [];
 
   const racesRemaining = series.regular_season_races - racesCompleted - (raceCompleted ? 1 : 0);
-  const stagesRemaining = racesRemaining * 2 - (stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
+  const stagesRemaining = racesRemaining * 2 - (raceCompleted ? 0 : stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
 
   const maximumPointsRemaining = (position: number) => {
     const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
