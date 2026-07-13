@@ -21,11 +21,11 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
     return [];
 
   const racesRemaining = series.regular_season_races - racesCompleted;
+  const stagesRemaining = racesRemaining * 2 - (stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
 
   const maximumPointsRemaining = (position: number) => {
     const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
     const stagePoints = position <= 10 ? 11 - position : 0;
-    const stagesRemaining = racesRemaining * 2 - (stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
     return basePoints * racesRemaining + stagePoints * stagesRemaining;
   };
 
@@ -48,7 +48,7 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
   const calculated = [];
   for (const driver of standings) {
     const playoffEligible = eligibleDrivers.includes(driver);
-    const playoffPossible = driver.points + racesRemaining * 76 >= cutoffPoints;
+    const playoffPossible = driver.points + maximumPointsRemaining(1) >= cutoffPoints;
     const pointsToCutline =
       driver.points -
       (driver.position > playoffSpots ? cutoffPoints : standings[playoffSpots].points);

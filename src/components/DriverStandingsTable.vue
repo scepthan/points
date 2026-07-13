@@ -99,13 +99,18 @@ const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => 
         : "playoff-cutoff",
     );
   }
+  const stagesRemaining = Math.max(2 - (props.liveStagePoints?.length ?? 0), 0);
+  const maxPointsAvailable = 56 + stagesRemaining;
   if (!driver.playoffPossible) {
-    classes.push("playoff-impossible");
+    classes.push("playoff-eliminated");
   } else if (!driver.playoffEligible) {
     classes.push("playoff-ineligible");
   } else if (driver.playoffClinched) {
     classes.push("playoff-clinched");
-  } else if (driver.playoffPointsToClinch !== null && driver.playoffPointsToClinch <= 76) {
+  } else if (
+    driver.playoffPointsToClinch !== null &&
+    driver.playoffPointsToClinch <= maxPointsAvailable
+  ) {
     classes.push("playoff-clinchable");
   }
   return { class: classes };
@@ -113,9 +118,9 @@ const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => 
 
 const legendEntries = [
   { class: "playoff-clinched", text: "Mathematically clinched Chase spot" },
-  { class: "playoff-clinchable", text: "Can mathematically clinch Chase spot next race" },
+  { class: "playoff-clinchable", text: "Can mathematically clinch Chase spot this race" },
   { class: "playoff-ineligible", text: "Ineligible for Chase" },
-  { class: "playoff-impossible", text: "Mathematically eliminated from Chase" },
+  { class: "playoff-eliminated", text: "Mathematically eliminated from Chase" },
 ];
 </script>
 
@@ -127,8 +132,8 @@ const legendEntries = [
   border-bottom: 2px solid #ff2108 !important;
 }
 
-:deep(.playoff-impossible td),
-:deep(div.playoff-impossible) {
+:deep(.playoff-eliminated td),
+:deep(div.playoff-eliminated) {
   background-color: #510400 !important;
 }
 :deep(.playoff-ineligible td),
