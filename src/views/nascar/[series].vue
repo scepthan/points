@@ -16,7 +16,9 @@
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
       <p v-if="liveRaceInfo?.series_id === seriesId">
-        Race at {{ liveRaceInfo.track_name }} is live! (Flag state: {{ flagState }})
+        Race at {{ liveRaceInfo.track_name }} is live! (Lap {{ liveRaceInfo.lap_number }}/{{
+          liveRaceInfo.laps_in_race
+        }}; {{ flagState }})
       </p>
       <DriverStandingsTable :entries="entries" />
     </div>
@@ -66,17 +68,17 @@ const liveRaceInfo = computed(() => liveRaceQuery.liveRaceInfo.value);
 const flagState = computed(() => {
   switch (liveRaceInfo.value?.flag_state ?? null) {
     case 1:
-      return "green";
+      return "green flag";
     case 2:
-      return "yellow";
+      return "yellow flag";
     case 3:
-      return "red";
+      return "red flag";
     case 5:
       return "warmup";
     case 8:
       return "pre-race";
     case 9:
-      return "checkered";
+      return "checkered flag";
     default:
       return "unknown";
   }
