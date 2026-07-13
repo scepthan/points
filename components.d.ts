@@ -14,6 +14,7 @@ declare module 'vue' {
     CarBadge: typeof import('./src/components/CarBadge.vue')['default']
     DriverStandingsTable: typeof import('./src/components/DriverStandingsTable.vue')['default']
     PointsToClinchDisplay: typeof import('./src/components/PointsToClinchDisplay.vue')['default']
+    PositionDisplay: typeof import('./src/components/PositionDisplay.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     StartsDisplay: typeof import('./src/components/StartsDisplay.vue')['default']

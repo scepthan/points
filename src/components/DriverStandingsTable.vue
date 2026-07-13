@@ -17,6 +17,10 @@
     :items-per-page="-1"
     hide-default-footer
   >
+    <template v-slot:item.position="{ item }">
+      <PositionDisplay :current="item.position" :previous="item.previousPosition" />
+    </template>
+
     <template v-slot:item.car_no="{ item }">
       <CarBadge :number="item.car_no" />
     </template>
