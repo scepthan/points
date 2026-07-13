@@ -1,40 +1,80 @@
-import type { DriverStandingsEntry, LiveStagePointsInfo } from "@/types";
+import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsInfo } from "@/types";
 
-type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
+export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
   previousPoints: number;
   currentRacePoints: number;
+  projectedRacePoints: number;
+  runningPosition: number;
+  fastestLap: boolean;
   previousPosition: number;
 };
 
 export const useLivePointsCalculation = (
   entries: DriverStandingsEntry[],
+  calcProjection: boolean,
   liveStagePoints?: LiveStagePointsInfo[],
+  liveRaceInfo?: LiveRaceInfo,
 ): ExpandedDriverStandingsEntry[] => {
   const defaultEntries = entries.map((entry) => ({
     ...entry,
     previousPoints: entry.points,
     currentRacePoints: 0,
+    projectedRacePoints: 0,
+    runningPosition: 0,
+    fastestLap: false,
     previousPosition: entry.position,
   }));
   if (!liveStagePoints) return defaultEntries;
 
+  const { driverId: fastLapDriver } = defaultEntries.reduce(
+    (currentBest, nextDriver) => {
+      const liveEntry = liveRaceInfo?.vehicles.find(
+        (liveEntry) => liveEntry.driver.driver_id === nextDriver.driver_id,
+      );
+      if (!liveEntry) return currentBest;
+      if (liveEntry.best_lap_time >= currentBest.bestLapTime) {
+        return currentBest;
+      }
+      return { driverId: nextDriver.driver_id, bestLapTime: liveEntry.best_lap_time };
+    },
+    { driverId: 0, bestLapTime: Infinity },
+  );
+
   const updatedEntries = defaultEntries
     .map((entry) => {
-      let totalStagePoints = 0;
+      let currentRacePoints = 0;
       liveStagePoints?.forEach((stagePoints) => {
         const liveEntry = stagePoints.results.find(
           (liveEntry) => liveEntry.driver_id === entry.driver_id,
         );
         if (liveEntry) {
-          totalStagePoints += liveEntry.stage_points;
+          currentRacePoints += liveEntry.stage_points;
         }
       });
+
+      const fastestLap = entry.driver_id === fastLapDriver;
+      let projectedRacePoints = 0;
+      let runningPosition = 0;
+      if (calcProjection && liveRaceInfo) {
+        const liveEntry = liveRaceInfo.vehicles.find(
+          (liveEntry) => liveEntry.driver.driver_id === entry.driver_id,
+        );
+        if (liveEntry) {
+          runningPosition = liveEntry.running_position;
+          projectedRacePoints += (11 - runningPosition) * Math.max(0, 2 - liveStagePoints.length);
+          projectedRacePoints += runningPosition === 1 ? 55 : 37 - runningPosition;
+          if (fastestLap) projectedRacePoints += 1;
+        }
+      }
 
       return {
         ...entry,
         previousPoints: entry.points,
-        points: entry.points + totalStagePoints,
-        currentRacePoints: totalStagePoints,
+        points: entry.points + currentRacePoints + projectedRacePoints,
+        currentRacePoints,
+        runningPosition,
+        fastestLap,
+        projectedRacePoints,
       };
     })
     .sort((a, b) => b.points - a.points || b.wins - a.wins);

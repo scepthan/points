@@ -33,15 +33,7 @@
     </template>
 
     <template v-slot:item.points="{ item }">
-      <v-tooltip
-        v-if="item.currentRacePoints > 0"
-        :text="`${item.previousPoints} points + ${item.currentRacePoints} earned this race`"
-      >
-        <template v-slot:activator="{ props }">
-          <span v-bind="props" class="hover-tooltip">{{ item.points }}</span>
-        </template>
-      </v-tooltip>
-      <span v-else>{{ item.points }}</span>
+      <CurrentPointsDisplay :entry="item" />
     </template>
 
     <template v-slot:item.pointsToCutline="{ item }">
@@ -55,7 +47,7 @@
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">
-      <PointsToClinchDisplay :driver="item" />
+      <PointsToClinchDisplay :entry="item" />
     </template>
 
     <template v-slot:item.starts="{ item }">
@@ -71,18 +63,28 @@
 </template>
 
 <script setup lang="ts">
-import { useCurrentSeason, usePlayoffCalculation, type PlayoffCalculated } from "@/composables";
-import { useLivePointsCalculation } from "@/composables/useLivePointsCalculation";
+import {
+  useCurrentSeason,
+  useLivePointsCalculation,
+  usePlayoffCalculation,
+  type PlayoffCalculated,
+} from "@/composables";
 import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsInfo } from "@/types";
 
 const props = defineProps<{
   entries: DriverStandingsEntry[];
+  projection: boolean;
   liveRaceInfo?: LiveRaceInfo;
   liveStagePoints?: LiveStagePointsInfo[];
 }>();
 
 const calculatedEntries = computed(() => {
-  const liveEntries = useLivePointsCalculation(props.entries, props.liveStagePoints);
+  const liveEntries = useLivePointsCalculation(
+    props.entries,
+    props.projection,
+    props.liveStagePoints,
+    props.liveRaceInfo,
+  );
   return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length);
 });
 
@@ -100,7 +102,7 @@ const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => 
     );
   }
   const stagesRemaining = Math.max(2 - (props.liveStagePoints?.length ?? 0), 0);
-  const maxPointsAvailable = 56 + stagesRemaining;
+  const maxPointsAvailable = props.projection ? 0 : 56 + 10 * stagesRemaining;
   if (!driver.playoffPossible) {
     classes.push("playoff-eliminated");
   } else if (!driver.playoffEligible) {

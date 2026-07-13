@@ -1,42 +1,33 @@
 <template>
-  <span v-if="driver.playoffPointsToClinch === null">&ndash;</span>
+  <span v-if="entry.playoffPointsToClinch === null">&ndash;</span>
   <v-tooltip v-else :text="tooltipText">
     <template v-slot:activator="{ props }">
       <span v-bind="props" class="hover-tooltip">{{
-        driver.playoffPointsToClinch <= 0 ? "Clinched" : "+" + driver.playoffPointsToClinch
+        entry.playoffPointsToClinch <= 0 ? "Clinched" : "+" + entry.playoffPointsToClinch
       }}</span>
     </template>
   </v-tooltip>
 </template>
 
 <script setup lang="ts">
-import { useCurrentSeason, type PlayoffCalculated } from "@/composables";
+import { cardinalNumber, useCurrentSeason, type PlayoffCalculated } from "@/composables";
 import type { DriverStandingsEntry } from "@/types";
 
 const props = defineProps<{
-  driver: PlayoffCalculated<DriverStandingsEntry>;
+  entry: PlayoffCalculated<DriverStandingsEntry>;
 }>();
 
 const { series } = useCurrentSeason();
 
-const cardinalNumber = (n: number) => {
-  n %= 100;
-  if (n >= 11 && n <= 20) return n + "th";
-  if (n % 10 === 1) return n + "st";
-  if (n % 10 === 2) return n + "nd";
-  if (n % 10 === 3) return n + "rd";
-  return n + "th";
-};
-
 const tooltipText = computed(() => {
-  if (props.driver.playoffPointsToClinch === null || series.value === null) return "";
-  const driverCurrentlyInPlayoffs = props.driver.position <= series.value.playoff_spots;
-  const driversToClinch = props.driver.playoffDriversBeatenToClinch ?? 0;
+  if (props.entry.playoffPointsToClinch === null || series.value === null) return "";
+  const driverCurrentlyInPlayoffs = props.entry.position <= series.value.playoff_spots;
+  const driversToClinch = props.entry.playoffDriversBeatenToClinch ?? 0;
 
   const driverWithinPositions =
     driverCurrentlyInPlayoffs &&
-    props.driver.position > series.value.playoff_spots + 1 - driversToClinch;
-  const totalPointsToClinch = props.driver.points + props.driver.playoffPointsToClinch;
+    props.entry.position > series.value.playoff_spots + 1 - driversToClinch;
+  const totalPointsToClinch = props.entry.points + props.entry.playoffPointsToClinch;
 
   const highPosition = cardinalNumber(
     series.value.playoff_spots +
@@ -53,15 +44,15 @@ const tooltipText = computed(() => {
       : `${driversToClinch} ${driverWithinPositions ? "other " : ""} drivers currently in ${highPosition} to ${lowPosition}`;
   const allText = driversToClinch === 1 ? "" : " all";
 
-  if (props.driver.playoffClinched) {
+  if (props.entry.playoffClinched) {
     return (
       `The ${driverCountText} cannot${allText} surpass ${totalPointsToClinch} points,` +
-      ` meaning ${props.driver.driver_name} has clinched a Chase spot.`
+      ` meaning ${props.entry.driver_name} has clinched a Chase spot.`
     );
   }
 
   return (
-    `If ${props.driver.driver_name} reaches ${totalPointsToClinch} points,` +
+    `If ${props.entry.driver_name} reaches ${totalPointsToClinch} points,` +
     ` the ${driverCountText} will not${allText} be able to surpass them.`
   );
 });

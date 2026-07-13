@@ -6,16 +6,28 @@
       </router-link>
     </div>
 
+    <div class="d-flex justify-center">
+      <v-tabs v-if="currentlyInRace" v-model="selectedTab">
+        <v-tab>Current</v-tab>
+        <v-tab>Projected</v-tab>
+      </v-tabs>
+    </div>
+
     <div v-if="seriesInfo && entries.length > 0">
       <h1 class="my-1">
-        <span v-if="currentlyInRace && stagesComplete > 0">Unofficial </span>{{ standingsYear }}
-        {{ seriesInfo.name }} Driver Standings
+        <span v-if="currentlyInRace && selectedTab === 1">Projected </span
+        ><span v-else-if="currentlyInRace && stagesComplete > 0">Unofficial </span
+        >{{ standingsYear }} {{ seriesInfo.name }} Driver Standings
       </h1>
 
       <div class="my-1" v-if="currentlyInRace && liveRaceInfo">
         <p class="my-1">
           <!-- TODO: get correct stage count -->
-          Points earned as of completion of stage {{ stagesComplete }}/3, race
+          <span v-if="selectedTab === 1"
+            >Based on running order at lap {{ liveRaceInfo.lap_number }}/{{
+              liveRaceInfo.laps_in_race
+            }}</span
+          ><span v-else>Points earned as of completion of stage {{ stagesComplete }}/3</span>, race
           {{ racesCompleted + 1 }} of {{ totalRaces }}
         </p>
         <LiveRaceInfoDisplay :info="liveRaceInfo" />
@@ -28,6 +40,7 @@
       </p>
       <DriverStandingsTable
         :entries="entries"
+        :projection="selectedTab === 1"
         :live-race-info="liveRaceInfo"
         :live-stage-points="liveStagePoints"
       />
@@ -51,6 +64,8 @@ import {
 const route = useRoute();
 const seriesId = computed(() => Number(route.params.series));
 const seriesInfo = computed(() => allSeries.find((s) => s.id === seriesId.value));
+
+const selectedTab = ref(Number(route.query.projected ?? 0));
 
 const query = useGetDriverStandingsQuery(seriesId.value);
 const entries = computed(() => query.entries.value ?? []);

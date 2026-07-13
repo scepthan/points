@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CarBadge: typeof import('./src/components/CarBadge.vue')['default']
+    CurrentPointsDisplay: typeof import('./src/components/CurrentPointsDisplay.vue')['default']
     DriverStandingsTable: typeof import('./src/components/DriverStandingsTable.vue')['default']
     LiveRaceInfoDisplay: typeof import('./src/components/LiveRaceInfoDisplay.vue')['default']
     PointsToClinchDisplay: typeof import('./src/components/PointsToClinchDisplay.vue')['default']

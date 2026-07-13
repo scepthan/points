@@ -32,7 +32,7 @@ const flagState = computed(() => {
     case 9:
       return "checkered flag";
     default:
-      return "unknown status";
+      return `unknown status (${props.info.flag_state})`;
   }
 });
 </script>
