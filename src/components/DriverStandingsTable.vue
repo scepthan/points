@@ -1,6 +1,6 @@
 <template>
   <v-data-table
-    :items="entries"
+    :items="calculatedEntries"
     :headers="[
       { title: 'Pos', value: 'position' },
       { title: 'Num', value: 'car_no' },
@@ -26,6 +26,18 @@
         <span class="text-label-medium text-medium-emphasis">{{ item.driver_first_name }}</span>
         <span class="text-title-medium mt-n1">{{ item.driver_last_name }}</span>
       </div>
+    </template>
+
+    <template v-slot:item.points="{ item }">
+      <v-tooltip
+        v-if="item.currentRacePoints > 0"
+        :text="`${item.previousPoints} points + ${item.currentRacePoints} earned this race`"
+      >
+        <template v-slot:activator="{ props }">
+          <span v-bind="props" class="hover-tooltip">{{ item.points }}</span>
+        </template>
+      </v-tooltip>
+      <span v-else>{{ item.points }}</span>
     </template>
 
     <template v-slot:item.pointsToCutline="{ item }">
@@ -55,15 +67,24 @@
 </template>
 
 <script setup lang="ts">
-import { useCurrentSeason, type PlayoffCalculationEntry } from "@/composables";
+import { useCurrentSeason, usePlayoffCalculation, type PlayoffCalculated } from "@/composables";
+import { useLivePointsCalculation } from "@/composables/useLivePointsCalculation";
+import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsInfo } from "@/types";
 
 const props = defineProps<{
-  entries: PlayoffCalculationEntry[];
+  entries: DriverStandingsEntry[];
+  liveRaceInfo?: LiveRaceInfo;
+  liveStagePoints?: LiveStagePointsInfo[];
 }>();
+
+const calculatedEntries = computed(() => {
+  const liveEntries = useLivePointsCalculation(props.entries, props.liveStagePoints);
+  return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length);
+});
 
 const { racesCompleted, series } = useCurrentSeason();
 
-const playoffCutoffClass = (driver: PlayoffCalculationEntry) => {
+const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => {
   if (series.value === null || racesCompleted.value === null) return {};
 
   const classes = [];

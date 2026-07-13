@@ -10,10 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import { useCurrentSeason, type PlayoffCalculationEntry } from "@/composables";
+import { useCurrentSeason, type PlayoffCalculated } from "@/composables";
+import type { DriverStandingsEntry } from "@/types";
 
 const props = defineProps<{
-  driver: PlayoffCalculationEntry;
+  driver: PlayoffCalculated<DriverStandingsEntry>;
 }>();
 
 const { series } = useCurrentSeason();

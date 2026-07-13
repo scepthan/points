@@ -1,7 +1,7 @@
 import type { DriverStandingsEntry } from "@/types";
 import { useCurrentSeason } from "./useCurrentSeason";
 
-export type PlayoffCalculationEntry = DriverStandingsEntry & {
+export type PlayoffCalculated<T extends DriverStandingsEntry> = T & {
   playoffEligible: boolean;
   playoffPossible: boolean;
   pointsToCutline: number;
@@ -10,9 +10,10 @@ export type PlayoffCalculationEntry = DriverStandingsEntry & {
   playoffDriversBeatenToClinch: number | null;
 };
 
-export const usePlayoffCalculation = (
-  standings: DriverStandingsEntry[],
-): PlayoffCalculationEntry[] => {
+export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
+  standings: T[],
+  stagesCompleted?: number,
+): PlayoffCalculated<T>[] => {
   const currentSeason = useCurrentSeason();
   const series = currentSeason.series.value;
   const racesCompleted = currentSeason.racesCompleted.value;
@@ -24,7 +25,7 @@ export const usePlayoffCalculation = (
   const maximumPointsRemaining = (position: number) => {
     const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
     const stagePoints = position <= 10 ? 11 - position : 0;
-    const stagesRemaining = racesRemaining * 2; // Will need to account for Coca-Cola 600 eventually
+    const stagesRemaining = racesRemaining * 2 - (stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
     return basePoints * racesRemaining + stagePoints * stagesRemaining;
   };
 

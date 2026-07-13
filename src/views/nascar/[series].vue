@@ -7,20 +7,39 @@
     </div>
 
     <div v-if="seriesInfo && entries.length > 0">
-      <h1 class="mb-n4">{{ standingsYear }} {{ seriesInfo.name }} Driver Standings</h1>
+      <h1 class="my-1">
+        <span v-if="currentlyInRace && stagesComplete > 0">Unofficial </span>{{ standingsYear }}
+        {{ seriesInfo.name }} Driver Standings
+      </h1>
 
-      <p>
+      <div class="my-1" v-if="currentlyInRace && liveRaceInfo">
+        <p class="my-1">
+          <!-- TODO: get correct stage count -->
+          Points earned as of completion of stage {{ stagesComplete }}/3, race
+          {{ racesCompleted + 1 }} of {{ totalRaces }}
+        </p>
+        <h5 class="my-1">
+          Live: lap {{ liveRaceInfo.lap_number }}/{{ liveRaceInfo.laps_in_race }} (stage
+          {{ liveRaceInfo.stage.stage_num }} lap
+          {{
+            liveRaceInfo.lap_number -
+            (liveRaceInfo.stage.finish_at_lap - liveRaceInfo.stage.laps_in_stage)
+          }}/{{ liveRaceInfo.stage.finish_at_lap - liveRaceInfo.stage.laps_in_stage }});
+          {{ flagState }} at
+          {{ liveRaceInfo.track_name }}
+        </h5>
+      </div>
+      <p class="mt-n1" v-else>
         After race {{ racesCompleted }} of {{ totalRaces }} (<span
           v-if="racesCompleted < seriesInfo.regular_season_races"
           >{{ seriesInfo.regular_season_races - racesCompleted }} races until Chase</span
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
-      <p v-if="liveRaceInfo?.series_id === seriesId">
-        Race at {{ liveRaceInfo.track_name }} is live! (Lap {{ liveRaceInfo.lap_number }}/{{
-          liveRaceInfo.laps_in_race
-        }}; {{ flagState }})
-      </p>
-      <DriverStandingsTable :entries="entries" />
+      <DriverStandingsTable
+        :entries="entries"
+        :live-race-info="liveRaceInfo"
+        :live-stage-points="liveStagePoints"
+      />
     </div>
     <div v-else>
       <p v-if="query.isError.value">Error loading points standings for series ID {{ seriesId }}.</p>
@@ -31,15 +50,19 @@
 
 <script setup lang="ts">
 import { allSeries } from "@/assets";
-import { useCurrentSeason, usePlayoffCalculation } from "@/composables";
-import { useGetDriverStandingsQuery, useGetLiveRaceInfoQuery } from "@/network";
+import { useCurrentSeason } from "@/composables";
+import {
+  useGetDriverStandingsQuery,
+  useGetLiveRaceInfoQuery,
+  useGetLiveStagePointsInfoQuery,
+} from "@/network";
 
 const route = useRoute();
 const seriesId = computed(() => Number(route.params.series));
 const seriesInfo = computed(() => allSeries.find((s) => s.id === seriesId.value));
 
 const query = useGetDriverStandingsQuery(seriesId.value);
-const entries = computed(() => usePlayoffCalculation(query.entries.value ?? []));
+const entries = computed(() => query.entries.value ?? []);
 
 const racesCompleted = computed(() => Math.max(...entries.value.map((entry) => entry.starts)));
 const totalRaces = computed(() =>
@@ -64,9 +87,19 @@ updateCurrentSeason();
 watch([seriesInfo, standingsYear, racesCompleted], updateCurrentSeason);
 
 const liveRaceQuery = useGetLiveRaceInfoQuery();
-const liveRaceInfo = computed(() => liveRaceQuery.liveRaceInfo.value);
+const raceId = ref(liveRaceQuery.liveRaceInfo.value?.race_id ?? 0);
+const currentlyInRace = computed(
+  () =>
+    liveRaceQuery.liveRaceInfo.value?.series_id === seriesId.value &&
+    liveRaceQuery.liveRaceInfo.value.run_type === 3,
+);
+// Only propagate live info if it's for an active points race in this series
+const liveRaceInfo = computed(() =>
+  currentlyInRace.value ? liveRaceQuery.liveRaceInfo.value : undefined,
+);
+
 const flagState = computed(() => {
-  switch (liveRaceInfo.value?.flag_state ?? null) {
+  switch (liveRaceInfo.value?.flag_state) {
     case 1:
       return "green flag";
     case 2:
@@ -80,7 +113,25 @@ const flagState = computed(() => {
     case 9:
       return "checkered flag";
     default:
-      return "unknown";
+      return "unknown status";
   }
 });
+watch(liveRaceInfo, (newVal) => {
+  if (newVal) {
+    raceId.value = newVal.race_id;
+  }
+});
+watch(raceId, (newVal) => {
+  if (newVal > 0) {
+    liveStagePointsQuery.refetch();
+  }
+});
+
+const liveStagePointsQuery = useGetLiveStagePointsInfoQuery(
+  standingsYear.value,
+  seriesId.value,
+  raceId,
+);
+const liveStagePoints = computed(() => liveStagePointsQuery.liveStagePointsInfo.value);
+const stagesComplete = computed(() => liveStagePoints.value?.length ?? 0);
 </script>
