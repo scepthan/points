@@ -15,6 +15,9 @@
           >{{ seriesInfo.regular_season_races - racesCompleted }} races until Chase</span
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
+      <p v-if="liveRaceInfo?.series_id === seriesId">
+        Race at {{ liveRaceInfo.track_name }} is live! (Flag state: {{ flagState }})
+      </p>
       <DriverStandingsTable :entries="entries" />
     </div>
     <div v-else>
@@ -27,7 +30,7 @@
 <script setup lang="ts">
 import { allSeries } from "@/assets";
 import { useCurrentSeason, usePlayoffCalculation } from "@/composables";
-import { useGetDriverStandingsQuery } from "@/network";
+import { useGetDriverStandingsQuery, useGetLiveRaceInfoQuery } from "@/network";
 
 const route = useRoute();
 const seriesId = computed(() => Number(route.params.series));
@@ -57,4 +60,25 @@ const updateCurrentSeason = () => {
 };
 updateCurrentSeason();
 watch([seriesInfo, standingsYear, racesCompleted], updateCurrentSeason);
+
+const liveRaceQuery = useGetLiveRaceInfoQuery();
+const liveRaceInfo = computed(() => liveRaceQuery.liveRaceInfo.value);
+const flagState = computed(() => {
+  switch (liveRaceInfo.value?.flag_state ?? null) {
+    case 1:
+      return "green";
+    case 2:
+      return "yellow";
+    case 3:
+      return "red";
+    case 5:
+      return "warmup";
+    case 8:
+      return "pre-race";
+    case 9:
+      return "checkered";
+    default:
+      return "unknown";
+  }
+});
 </script>
