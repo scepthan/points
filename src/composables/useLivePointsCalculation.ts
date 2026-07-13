@@ -62,7 +62,7 @@ export const useLivePointsCalculation = (
         if (liveEntry) {
           runningPosition = liveEntry.running_position;
           projectedRacePoints += (11 - runningPosition) * Math.max(0, 2 - liveStagePoints.length);
-          projectedRacePoints += runningPosition === 1 ? 55 : 37 - runningPosition;
+          projectedRacePoints += runningPosition === 1 ? 55 : Math.max(37 - runningPosition, 1);
           if (fastestLap) projectedRacePoints += 1;
         }
       }

@@ -1,18 +1,7 @@
 <template>
   <v-data-table
     :items="calculatedEntries"
-    :headers="[
-      { title: 'Pos', value: 'position' },
-      { title: 'Num', value: 'car_no' },
-      { title: 'Driver', value: 'driver_last_name' },
-      { title: 'Points', value: 'points' },
-      { title: 'Cutline', value: 'pointsToCutline' },
-      { title: 'Leader', value: 'delta_leader' },
-      { title: 'To Clinch', value: 'playoffPointsToClinch' },
-      { title: 'Starts', value: 'starts' },
-      { title: 'Wins', value: 'wins' },
-      { title: 'DNFs', value: 'dnf' },
-    ]"
+    :headers="tableHeaders"
     :row-props="(item) => playoffCutoffClass(item.item)"
     :items-per-page="-1"
     hide-default-footer
@@ -34,6 +23,13 @@
 
     <template v-slot:item.points="{ item }">
       <CurrentPointsDisplay :entry="item" />
+    </template>
+
+    <template v-slot:item.projectedPoints="{ item }">
+      <span v-if="item.currentRacePoints + item.projectedRacePoints > 0">
+        +{{ item.currentRacePoints + item.projectedRacePoints }}
+      </span>
+      <span v-else>&ndash;</span>
     </template>
 
     <template v-slot:item.pointsToCutline="{ item }">
@@ -85,8 +81,33 @@ const calculatedEntries = computed(() => {
     props.liveStagePoints,
     props.liveRaceInfo,
   );
-  return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length, props.projection);
+  return usePlayoffCalculation(
+    liveEntries,
+    props.liveStagePoints?.length,
+    props.liveStagePoints && props.projection,
+  );
 });
+
+const anyEarnedPoints = computed(() =>
+  calculatedEntries.value.some((entry) => entry.currentRacePoints || entry.projectedRacePoints),
+);
+const noneEarnedPoints = computed(() => !anyEarnedPoints.value);
+
+const tableHeaders = computed(() =>
+  [
+    { title: "Pos", value: "position" },
+    { title: "Num", value: "car_no" },
+    { title: "Driver", value: "driver_last_name" },
+    { title: "Points", value: "points" },
+    { title: "Today", value: "projectedPoints", if: anyEarnedPoints },
+    { title: "Cutline", value: "pointsToCutline" },
+    { title: "Leader", value: "delta_leader" },
+    { title: "To Clinch", value: "playoffPointsToClinch" },
+    { title: "Starts", value: "starts" },
+    { title: "Wins", value: "wins" },
+    { title: "DNFs", value: "dnf", if: noneEarnedPoints },
+  ].filter((header) => (header.if !== undefined ? unref(header.if) : true)),
+);
 
 const { racesCompleted, series } = useCurrentSeason();
 
