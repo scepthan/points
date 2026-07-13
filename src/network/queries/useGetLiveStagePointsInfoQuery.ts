@@ -12,7 +12,7 @@ export const useGetLiveStagePointsInfoQuery = (
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKey,
     queryFn: fetch,
-    refetchInterval: 1000 * 30,
+    refetchInterval: 1000 * 15,
   });
 
   return {

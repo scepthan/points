@@ -21,6 +21,11 @@
       </div>
     </template>
 
+    <template v-slot:item.runningPosition="{ item }">
+      <span v-if="item.runningPosition">{{ cardinalNumber(item.runningPosition) }}</span>
+      <span v-else>&ndash;</span>
+    </template>
+
     <template v-slot:item.points="{ item }">
       <CurrentPointsDisplay :entry="item" />
     </template>
@@ -60,6 +65,7 @@
 
 <script setup lang="ts">
 import {
+  cardinalNumber,
   useCurrentSeason,
   useLivePointsCalculation,
   usePlayoffCalculation,
@@ -92,6 +98,7 @@ const anyEarnedPoints = computed(() =>
   calculatedEntries.value.some((entry) => entry.currentRacePoints || entry.projectedRacePoints),
 );
 const noneEarnedPoints = computed(() => !anyEarnedPoints.value);
+const usingProjection = computed(() => props.projection);
 
 const tableHeaders = computed(() =>
   [
@@ -100,6 +107,7 @@ const tableHeaders = computed(() =>
     { title: "Driver", value: "driver_last_name" },
     { title: "Points", value: "points" },
     { title: "Today", value: "projectedPoints", if: anyEarnedPoints },
+    { title: "Running", value: "runningPosition", if: usingProjection },
     { title: "Cutline", value: "pointsToCutline" },
     { title: "Leader", value: "delta_leader" },
     { title: "To Clinch", value: "playoffPointsToClinch" },

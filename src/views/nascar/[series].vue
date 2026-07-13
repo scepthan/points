@@ -97,7 +97,8 @@ const raceId = ref(liveRaceQuery.liveRaceInfo.value?.race_id ?? 0);
 const currentlyInRace = computed(
   () =>
     liveRaceQuery.liveRaceInfo.value?.series_id === seriesId.value &&
-    liveRaceQuery.liveRaceInfo.value.run_type === 3,
+    liveRaceQuery.liveRaceInfo.value.run_type === 3 &&
+    liveRaceQuery.liveRaceInfo.value.flag_state !== 9,
 );
 // Only propagate live info if it's for an active points race in this series
 const liveRaceInfo = computed(() =>

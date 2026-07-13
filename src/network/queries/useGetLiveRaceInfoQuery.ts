@@ -8,7 +8,7 @@ export const useGetLiveRaceInfoQuery = () => {
   const { data, isPending, isError } = useQuery({
     queryKey: queryKey,
     queryFn: fetch,
-    refetchInterval: 1000 * 30,
+    refetchInterval: 1000 * 15,
   });
 
   return {

@@ -6,6 +6,7 @@ export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
   projectedRacePoints: number;
   runningPosition: number;
   fastestLap: boolean;
+  stagesWon: number[];
   previousPosition: number;
 };
 
@@ -22,6 +23,7 @@ export const useLivePointsCalculation = (
     projectedRacePoints: 0,
     runningPosition: 0,
     fastestLap: false,
+    stagesWon: [],
     previousPosition: entry.position,
   }));
   if (!liveStagePoints) return defaultEntries;
