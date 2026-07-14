@@ -39,7 +39,7 @@ export const useLivePointsCalculation = (
   const entriesMatch = (entry: StandingsEntry, liveEntry: LiveRaceVehicleInfo) =>
     entry.name.type === "driver"
       ? liveEntry.driver.driver_id.toString() === entry.entryId
-      : liveEntry.vehicle_number === entry.carNumber.slice(-2);
+      : liveEntry.vehicle_number === entry.entryId.slice(-2);
 
   const findLiveEntry = (entry: StandingsEntry) =>
     liveRaceInfo?.vehicles.find((liveEntry) => entriesMatch(entry, liveEntry));
@@ -68,7 +68,7 @@ export const useLivePointsCalculation = (
       const stagePointsResult = stage.results.find((liveStagePoints) =>
         entry.name.type === "driver"
           ? liveStagePoints.driver_id.toString() === entry.entryId
-          : liveStagePoints.vehicle_number === entry.carNumber.slice(-2),
+          : liveStagePoints.vehicle_number === entry.entryId.slice(-2),
       );
       if (stagePointsResult) {
         currentRacePoints += stagePointsResult.stage_points;

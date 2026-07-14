@@ -1,4 +1,4 @@
-import type { LiveStagePointsEntry } from "@/types/LiveStagePointsInfo";
+import type { LiveStagePointsEntry } from "@/types/dtos/LiveStagePointsInfo";
 
 export const GetLiveStagePointsInfoEndpoint = async (
   seasonId: number,

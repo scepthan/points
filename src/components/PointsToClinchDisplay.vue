@@ -47,7 +47,7 @@ const tooltipText = computed(() => {
   const entryName =
     props.entry.name.type === "driver"
       ? props.entry.name.full
-      : props.entry.name.full + " #" + props.entry.carNumber;
+      : props.entry.name.full + " #" + props.entry.entryId;
 
   if (props.entry.playoffClinched) {
     return (
