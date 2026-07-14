@@ -1,4 +1,10 @@
-import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsEntry } from "@/types";
+import type {
+  DriverStandingsEntry,
+  LiveRaceInfo,
+  LiveRaceVehicleInfo,
+  LiveStagePointsEntry,
+  StandingsEntry,
+} from "@/types";
 
 export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
   previousPoints: number;
@@ -11,12 +17,12 @@ export type ExpandedDriverStandingsEntry = DriverStandingsEntry & {
 };
 
 export const useLivePointsCalculation = (
-  entries: DriverStandingsEntry[],
+  entries: StandingsEntry[],
   calcProjection: boolean,
-  liveStagePoints?: LiveStagePointsEntry[],
+  liveStageInfo?: LiveStagePointsEntry[],
   liveRaceInfo?: LiveRaceInfo,
-): ExpandedDriverStandingsEntry[] => {
-  const defaultEntries = entries.map((entry) => ({
+): StandingsEntry[] => {
+  const updatedEntries: StandingsEntry[] = entries.map((entry) => ({
     ...entry,
     previousPoints: entry.points,
     currentRacePoints: 0,
@@ -26,65 +32,80 @@ export const useLivePointsCalculation = (
     stagesWon: [],
     previousPosition: entry.position,
   }));
-  if (!liveStagePoints) return defaultEntries;
+  if (!liveStageInfo) return updatedEntries;
+  // TODO: account for Coca-Cola 600
+  const stagesRemaining = Math.max(0, 2 - liveStageInfo.length);
 
-  const { driverId: fastLapDriver } = defaultEntries.reduce(
-    (currentBest, nextDriver) => {
-      const liveEntry = liveRaceInfo?.vehicles.find(
-        (liveEntry) => liveEntry.driver.driver_id === nextDriver.driver_id,
-      );
+  const entriesMatch = (entry: StandingsEntry, liveEntry: LiveRaceVehicleInfo) =>
+    entry.name.type === "driver"
+      ? liveEntry.driver.driver_id.toString() === entry.entryId
+      : liveEntry.vehicle_number === entry.carNumber.slice(-2);
+
+  const findLiveEntry = (entry: StandingsEntry) =>
+    liveRaceInfo?.vehicles.find((liveEntry) => entriesMatch(entry, liveEntry));
+
+  const { entryId: fastLapDriver } = updatedEntries.reduce(
+    (currentBest, entry) => {
+      const liveEntry = findLiveEntry(entry);
       if (!liveEntry) return currentBest;
       if (liveEntry.best_lap_time >= currentBest.bestLapTime) {
         return currentBest;
       }
-      return { driverId: nextDriver.driver_id, bestLapTime: liveEntry.best_lap_time };
+      return { entryId: entry.entryId, bestLapTime: liveEntry.best_lap_time };
     },
-    { driverId: 0, bestLapTime: Infinity },
+    { entryId: "", bestLapTime: Infinity },
   );
 
-  const updatedEntries = defaultEntries
-    .map((entry) => {
-      let currentRacePoints = 0;
-      liveStagePoints?.forEach((stagePoints) => {
-        const liveEntry = stagePoints.results.find(
-          (liveEntry) => liveEntry.driver_id === entry.driver_id,
-        );
-        if (liveEntry) {
-          currentRacePoints += liveEntry.stage_points;
-        }
-      });
+  for (const liveEntry of liveRaceInfo?.vehicles ?? []) {
+    const entry = updatedEntries.find((entry) => entriesMatch(entry, liveEntry));
+    if (!entry) {
+      console.warn("Could not find standings entry for entry:", entry);
+      continue;
+    }
 
-      const fastestLap = entry.driver_id === fastLapDriver;
-      let projectedRacePoints = 0;
-      let runningPosition = 0;
-      if (calcProjection && liveRaceInfo) {
-        const liveEntry = liveRaceInfo.vehicles.find(
-          (liveEntry) => liveEntry.driver.driver_id === entry.driver_id,
-        );
-        if (liveEntry) {
-          runningPosition = liveEntry.running_position;
-          projectedRacePoints += (11 - runningPosition) * Math.max(0, 2 - liveStagePoints.length);
-          projectedRacePoints += runningPosition === 1 ? 55 : Math.max(37 - runningPosition, 1);
-          if (fastestLap) projectedRacePoints += 1;
+    let currentRacePoints = 0;
+    for (const stage of liveStageInfo) {
+      const stagePointsResult = stage.results.find((liveStagePoints) =>
+        entry.name.type === "driver"
+          ? liveStagePoints.driver_id.toString() === entry.entryId
+          : liveStagePoints.vehicle_number === entry.carNumber.slice(-2),
+      );
+      if (stagePointsResult) {
+        currentRacePoints += stagePointsResult.stage_points;
+        if (stagePointsResult.position === 1) {
+          entry.stagesWon.push(stage.stage_number);
         }
       }
+    }
 
-      return {
-        ...entry,
-        previousPoints: entry.points,
-        points: entry.points + currentRacePoints + projectedRacePoints,
-        currentRacePoints,
-        runningPosition,
-        fastestLap,
-        projectedRacePoints,
-      };
-    })
-    .sort((a, b) => b.points - a.points || b.wins - a.wins);
+    const fastestLap = entry.entryId === fastLapDriver;
+    let projectedRacePoints = 0;
+    let runningPosition = 0;
+    if (calcProjection && liveRaceInfo) {
+      const liveEntry = findLiveEntry(entry);
+      if (liveEntry) {
+        runningPosition = liveEntry.running_position;
+        projectedRacePoints += Math.max(0, 11 - runningPosition) * stagesRemaining;
+        projectedRacePoints += runningPosition === 1 ? 55 : Math.max(1, 37 - runningPosition);
+        if (fastestLap) projectedRacePoints += 1;
+      }
+    }
 
-  return updatedEntries.map((entry, index) => ({
-    ...entry,
-    previousPosition: entry.position,
-    position: index + 1,
-    delta_leader: index === 0 ? 0 : entry.points - updatedEntries[0].points,
-  }));
+    entry.currentRacePoints = currentRacePoints;
+    entry.projectedRacePoints = projectedRacePoints;
+    entry.points += currentRacePoints + projectedRacePoints;
+    entry.runningPosition = runningPosition;
+    entry.fastestLap = fastestLap;
+  }
+
+  // TODO: sort by best finishes? (actual tiebreaker)
+  updatedEntries.sort((a, b) => b.points - a.points || b.wins - a.wins);
+
+  let position = 1;
+  for (const entry of updatedEntries) {
+    entry.position = position++;
+    entry.deltaLeader = entry.points - updatedEntries[0].points;
+  }
+
+  return updatedEntries;
 };

@@ -1,20 +1,11 @@
-import type { DriverStandingsEntry } from "@/types";
+import type { StandingsEntry } from "@/types";
 import { useCurrentSeason } from "./useCurrentSeason";
 
-export type PlayoffCalculated<T extends DriverStandingsEntry> = T & {
-  playoffEligible: boolean;
-  playoffPossible: boolean;
-  pointsToCutline: number;
-  playoffClinched: boolean;
-  playoffPointsToClinch: number | null;
-  playoffDriversBeatenToClinch: number | null;
-};
-
-export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
-  standings: T[],
+export const usePlayoffCalculation = (
+  standings: StandingsEntry[],
   stagesCompleted?: number,
   raceCompleted?: boolean,
-): PlayoffCalculated<T>[] => {
+): StandingsEntry[] => {
   const currentSeason = useCurrentSeason();
   const series = currentSeason.series.value;
   const racesCompleted = currentSeason.racesCompleted.value;
@@ -22,7 +13,8 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
     return [];
 
   const racesRemaining = series.regular_season_races - racesCompleted - (raceCompleted ? 1 : 0);
-  const stagesRemaining = racesRemaining * 2 - (raceCompleted ? 0 : stagesCompleted || 0); // Will need to account for Coca-Cola 600 eventually
+  // TODO: account for Coca-Cola 600
+  const stagesRemaining = racesRemaining * 2 - (raceCompleted ? 0 : stagesCompleted || 0);
 
   const maximumPointsRemaining = (position: number) => {
     const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
@@ -30,9 +22,9 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
     return basePoints * racesRemaining + stagePoints * stagesRemaining;
   };
 
-  const maximumPointsForNDrivers = (driver_count: number) => {
+  const maximumPointsForNDrivers = (driverCount: number) => {
     let total = 0;
-    for (let i = 0; i < driver_count; i++) {
+    for (let i = 0; i < driverCount; i++) {
       total += maximumPointsRemaining(i + 1);
     }
     return total;
@@ -41,25 +33,27 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
   const playoffSpots = series.playoff_spots;
   const cutoffPoints = standings[playoffSpots - 1].points;
 
-  const eligibleDrivers = standings.filter(
-    (driver) =>
-      driver.starts === racesCompleted || currentSeason.getDriverWaiver(driver) !== undefined,
+  const eligibleEntries = standings.filter(
+    (entry) =>
+      entry.starts === racesCompleted ||
+      (entry.name.type === "driver" &&
+        currentSeason.getDriverWaiver(entry.name.full) !== undefined),
   );
 
   const calculated = [];
-  for (const driver of standings) {
-    const playoffEligible = eligibleDrivers.includes(driver);
-    const playoffPossible = driver.points + maximumPointsRemaining(1) >= cutoffPoints;
+  for (const entry of standings) {
+    const playoffEligible = eligibleEntries.includes(entry);
+    const playoffPossible = entry.points + maximumPointsRemaining(1) >= cutoffPoints;
     const pointsToCutline =
-      driver.points -
-      (driver.position > playoffSpots ? cutoffPoints : standings[playoffSpots].points);
+      entry.points -
+      (entry.position > playoffSpots ? cutoffPoints : standings[playoffSpots].points);
     let playoffClinched = false;
     let playoffPointsToClinch: number | null = null;
     let playoffDriversBeatenToClinch: number | null = null;
 
     if (playoffEligible && playoffPossible) {
-      const currentPlayoffsWithoutDriver = eligibleDrivers
-        .filter((d) => d !== driver)
+      const currentPlayoffsWithoutDriver = eligibleEntries
+        .filter((d) => d !== entry)
         .slice(0, playoffSpots);
 
       let lowestHighestPossibleCutoff = Infinity;
@@ -73,9 +67,9 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
         );
         if (highestPossibleCutoff < lowestHighestPossibleCutoff) {
           lowestHighestPossibleCutoff = highestPossibleCutoff;
-          playoffPointsToClinch = highestPossibleCutoff - driver.points;
+          playoffPointsToClinch = highestPossibleCutoff - entry.points;
           playoffDriversBeatenToClinch = i;
-          if (driver.points >= highestPossibleCutoff) {
+          if (entry.points >= highestPossibleCutoff) {
             playoffClinched = true;
             break;
           }
@@ -83,16 +77,15 @@ export const usePlayoffCalculation = <T extends DriverStandingsEntry>(
       }
     }
 
-    calculated.push(
-      Object.assign({}, driver, {
-        playoffEligible,
-        playoffPossible,
-        pointsToCutline,
-        playoffClinched,
-        playoffPointsToClinch,
-        playoffDriversBeatenToClinch,
-      }),
-    );
+    calculated.push({
+      ...entry,
+      playoffEligible,
+      playoffPossible,
+      pointsToCutline,
+      playoffClinched,
+      playoffPointsToClinch,
+      playoffDriversBeatenToClinch,
+    });
   }
 
   return calculated;

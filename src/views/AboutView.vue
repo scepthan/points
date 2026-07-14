@@ -96,11 +96,11 @@
       To be out of reach for Taylor Gray at this point, Allgaier would've needed to have a gap of 76
       &times; 7 = +532 or higher, which he was still over 100 points short of reaching. But for
       Allgaier to be knocked out of the top 12, he would need to also be passed by Retzlaff,
-      Sawalich, and Crews. His combined gap to all four of these drivers comes out to +1616, but by
-      referencing the previous table, we find the maximum amount of points the four of them could
-      possibly score in 7 races is 226 &times; 7 = 1582. This means that it was impossible for these
-      four to all overtake Allgaier, meaning he indeed clinched a spot in the Chase with an
-      incredible 7 races to go.
+      Sawalich, and Crews. By referencing the previous table, we find the maximum amount of points
+      the four of them could possibly score in 7 races is 226 &times; 7 = 1582. But Allgaier's
+      combined gap to all four of these drivers comes out to +1616, meaning that it was impossible
+      for all four to overtake him, and he had clinched a spot in the Chase with an incredible 7
+      races to go.
     </p>
 
     <!-- <h2>Okay, I get clinching, but how is the points to clinch number calculated?</h2> -->

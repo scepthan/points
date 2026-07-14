@@ -13,15 +13,16 @@
       <PositionDisplay :current="item.position" :previous="item.previousPosition" />
     </template>
 
-    <template v-slot:item.car_no="{ item }">
-      <CarBadge :number="item.car_no" />
+    <template v-slot:item.carNumber="{ item }">
+      <CarBadge :number="item.carNumber" />
     </template>
 
-    <template v-slot:item.driver_last_name="{ item }">
-      <div class="d-flex flex-column">
-        <span class="text-label-medium text-medium-emphasis">{{ item.driver_first_name }}</span>
-        <span class="text-title-medium mt-n1">{{ item.driver_last_name }}</span>
+    <template v-slot:item.name.full="{ item }">
+      <div v-if="item.name.type === 'driver'" class="d-flex flex-column">
+        <span class="text-label-medium text-medium-emphasis">{{ item.name.first }}</span>
+        <span class="text-title-medium mt-n1">{{ item.name.last }}</span>
       </div>
+      <span v-else>{{ item.name.full }}</span>
     </template>
 
     <template v-slot:item.runningPosition="{ item }">
@@ -45,9 +46,9 @@
       <span v-else>&minus;{{ Math.abs(item.pointsToCutline) }}</span>
     </template>
 
-    <template v-slot:item.delta_leader="{ item }">
-      <span v-if="item.delta_leader === 0">0</span>
-      <span v-else>&minus;{{ Math.abs(item.delta_leader) }}</span>
+    <template v-slot:item.deltaLeader="{ item }">
+      <span v-if="item.deltaLeader === 0">0</span>
+      <span v-else>&minus;{{ Math.abs(item.deltaLeader) }}</span>
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">
@@ -72,9 +73,14 @@ import {
   useCurrentSeason,
   useLivePointsCalculation,
   usePlayoffCalculation,
-  type PlayoffCalculated,
+  useStandingsConverter,
 } from "@/composables";
-import type { DriverStandingsEntry, LiveRaceInfo, LiveStagePointsEntry } from "@/types";
+import type {
+  DriverStandingsEntry,
+  LiveRaceInfo,
+  LiveStagePointsEntry,
+  StandingsEntry,
+} from "@/types";
 
 const props = defineProps<{
   entries: DriverStandingsEntry[];
@@ -83,9 +89,11 @@ const props = defineProps<{
   liveStagePoints?: LiveStagePointsEntry[];
 }>();
 
+const converter = useStandingsConverter();
+
 const calculatedEntries = computed(() => {
   const liveEntries = useLivePointsCalculation(
-    props.entries,
+    converter.convertDriverStandings(props.entries),
     props.projection,
     props.liveStagePoints,
     props.liveRaceInfo,
@@ -106,27 +114,27 @@ const usingProjection = computed(() => props.projection);
 const tableHeaders = computed(() =>
   [
     { title: "Pos", value: "position" },
-    { title: "Num", value: "car_no" },
-    { title: "Driver", value: "driver_last_name" },
+    { title: "Num", value: "carNumber" },
+    { title: "Driver", value: "name.full" },
     { title: "Points", value: "points" },
     { title: "Today", value: "projectedPoints", if: anyEarnedPoints },
     { title: "Running", value: "runningPosition", if: usingProjection },
     { title: "Cutline", value: "pointsToCutline" },
-    { title: "Leader", value: "delta_leader" },
+    { title: "Leader", value: "deltaLeader" },
     { title: "To Clinch", value: "playoffPointsToClinch" },
     { title: "Starts", value: "starts" },
     { title: "Wins", value: "wins" },
-    { title: "DNFs", value: "dnf", if: noneEarnedPoints },
+    { title: "DNFs", value: "dnfs", if: noneEarnedPoints },
   ].filter((header) => (header.if !== undefined ? unref(header.if) : true)),
 );
 
 const { racesCompleted, series } = useCurrentSeason();
 
-const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => {
+const playoffCutoffClass = (entry: StandingsEntry) => {
   if (series.value === null || racesCompleted.value === null) return {};
 
   const classes = [];
-  if (driver.position === series.value.playoff_spots) {
+  if (entry.position === series.value.playoff_spots) {
     classes.push(
       racesCompleted.value < series.value.regular_season_races
         ? "playoff-cutoff-upcoming"
@@ -135,15 +143,15 @@ const playoffCutoffClass = (driver: PlayoffCalculated<DriverStandingsEntry>) => 
   }
   const stagesRemaining = Math.max(2 - (props.liveStagePoints?.length ?? 0), 0);
   const maxPointsAvailable = props.projection ? 0 : 56 + 10 * stagesRemaining;
-  if (!driver.playoffPossible) {
+  if (!entry.playoffPossible) {
     classes.push("playoff-eliminated");
-  } else if (!driver.playoffEligible) {
+  } else if (!entry.playoffEligible) {
     classes.push("playoff-ineligible");
-  } else if (driver.playoffClinched) {
+  } else if (entry.playoffClinched) {
     classes.push("playoff-clinched");
   } else if (
-    driver.playoffPointsToClinch !== null &&
-    driver.playoffPointsToClinch <= maxPointsAvailable
+    entry.playoffPointsToClinch !== null &&
+    entry.playoffPointsToClinch <= maxPointsAvailable
   ) {
     classes.push("playoff-clinchable");
   }

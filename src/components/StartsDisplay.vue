@@ -9,21 +9,23 @@
 
 <script setup lang="ts">
 import { useCurrentSeason } from "@/composables";
-import type { DriverStandingsEntry } from "@/types";
+import type { StandingsEntry } from "@/types";
 
 const props = defineProps<{
-  entry: DriverStandingsEntry;
+  entry: StandingsEntry;
 }>();
 
-const { series, season, racesCompleted, getDriverWaiver } = useCurrentSeason();
+const { racesCompleted, getDriverWaiver } = useCurrentSeason();
 
-const waiver = computed(() => getDriverWaiver(props.entry));
+const waiver = computed(() =>
+  props.entry.name.type === "driver" ? getDriverWaiver(props.entry.name.full) : undefined,
+);
 
 const tooltipText = computed(() => {
   if (!waiver.value || racesCompleted.value === null) return "";
   const racesMissed = racesCompleted.value - props.entry.starts;
   return (
-    `${props.entry.driver_name} has received a waiver and will be eligible for the Chase` +
+    `${props.entry.name.full} has received a waiver and will be eligible for the Chase` +
     ` despite missing ${racesMissed} races due to ${waiver.value.reason}`
   );
 });

@@ -23,7 +23,7 @@ export interface LiveRaceInfo {
   stage: LiveRaceStageInfo;
 }
 
-interface LiveRaceVehicleInfo {
+export interface LiveRaceVehicleInfo {
   average_restart_speed: number;
   average_running_position: number;
   average_speed: number;

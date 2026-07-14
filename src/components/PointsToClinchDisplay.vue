@@ -10,11 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import { cardinalNumber, useCurrentSeason, type PlayoffCalculated } from "@/composables";
-import type { DriverStandingsEntry } from "@/types";
+import { cardinalNumber, useCurrentSeason } from "@/composables";
+import type { StandingsEntry } from "@/types";
 
 const props = defineProps<{
-  entry: PlayoffCalculated<DriverStandingsEntry>;
+  entry: StandingsEntry;
 }>();
 
 const { series } = useCurrentSeason();
@@ -44,15 +44,20 @@ const tooltipText = computed(() => {
       : `${driversToClinch} ${driverWithinPositions ? "other " : ""} drivers currently in ${highPosition} to ${lowPosition}`;
   const allText = driversToClinch === 1 ? "" : " all";
 
+  const entryName =
+    props.entry.name.type === "driver"
+      ? props.entry.name.full
+      : props.entry.name.full + " #" + props.entry.carNumber;
+
   if (props.entry.playoffClinched) {
     return (
       `The ${driverCountText} cannot${allText} surpass ${totalPointsToClinch} points,` +
-      ` meaning ${props.entry.driver_name} has clinched a Chase spot.`
+      ` meaning ${entryName} has clinched a Chase spot.`
     );
   }
 
   return (
-    `If ${props.entry.driver_name} reaches ${totalPointsToClinch} points,` +
+    `If ${entryName} reaches ${totalPointsToClinch} points,` +
     ` the ${driverCountText} will not${allText} be able to surpass them.`
   );
 });

@@ -8,14 +8,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  cardinalNumber,
-  type ExpandedDriverStandingsEntry,
-  type PlayoffCalculated,
-} from "@/composables";
+import { cardinalNumber } from "@/composables";
+import type { StandingsEntry } from "@/types";
 
 const props = defineProps<{
-  entry: PlayoffCalculated<ExpandedDriverStandingsEntry>;
+  entry: StandingsEntry;
 }>();
 
 const tooltipText = computed(() => {
