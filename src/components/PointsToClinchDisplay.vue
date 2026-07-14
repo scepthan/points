@@ -24,8 +24,8 @@ const displayValue = computed(() => {
   const pointsBase = props.baseEntry?.playoffPointsToClinch;
   if (points === null) return "";
   if (points <= 0) {
-    if (pointsBase !== null && pointsBase !== undefined && pointsBase <= 0) return "Clinched";
-    else return "Will clinch";
+    if (pointsBase !== null && pointsBase !== undefined && pointsBase > 0) return "Will clinch";
+    else return "Clinched";
   }
   return "+" + props.entry.playoffPointsToClinch;
 });

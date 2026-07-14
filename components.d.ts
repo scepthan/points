@@ -13,12 +13,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     CarBadge: typeof import('./src/components/CarBadge.vue')['default']
     CurrentPointsDisplay: typeof import('./src/components/CurrentPointsDisplay.vue')['default']
-    DriverStandingsTable: typeof import('./src/components/DriverStandingsTable.vue')['default']
     LiveRaceInfoDisplay: typeof import('./src/components/LiveRaceInfoDisplay.vue')['default']
     PointsToClinchDisplay: typeof import('./src/components/PointsToClinchDisplay.vue')['default']
     PositionDisplay: typeof import('./src/components/PositionDisplay.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StandingsTable: typeof import('./src/components/StandingsTable.vue')['default']
     StartsDisplay: typeof import('./src/components/StartsDisplay.vue')['default']
   }
 }

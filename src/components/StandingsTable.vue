@@ -99,11 +99,12 @@ const calculatedEntries = computed(() => {
 });
 
 const calculatedEntriesWithoutProjection = computed(() => {
+  if (!props.projection) return;
   const liveEntries = useLivePointsCalculation(props.entries, false, props.liveStagePoints);
   return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length);
 });
 const findBaseEntry = (entry: StandingsEntry) =>
-  calculatedEntriesWithoutProjection.value.find((entry2) => entry2.entryId === entry.entryId);
+  calculatedEntriesWithoutProjection.value?.find((entry2) => entry2.entryId === entry.entryId);
 
 const anyEarnedPoints = computed(() =>
   calculatedEntries.value.some((entry) => entry.currentRacePoints || entry.projectedRacePoints),

@@ -47,7 +47,7 @@
           >{{ seriesInfo.regular_season_races - racesCompleted }} races until Chase</span
         ><span v-else>{{ totalRaces - racesCompleted }} Chase races remaining</span>)
       </p>
-      <DriverStandingsTable
+      <StandingsTable
         :entries="entries"
         :projection="selectedTab === 1"
         :owners="selectedStandings === 'owners'"
