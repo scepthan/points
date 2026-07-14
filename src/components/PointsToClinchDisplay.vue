@@ -2,9 +2,7 @@
   <span v-if="entry.playoffPointsToClinch === null">&ndash;</span>
   <v-tooltip v-else :text="tooltipText">
     <template v-slot:activator="{ props }">
-      <span v-bind="props" class="hover-tooltip">{{
-        entry.playoffPointsToClinch <= 0 ? "Clinched" : "+" + entry.playoffPointsToClinch
-      }}</span>
+      <span v-bind="props" class="hover-tooltip">{{ displayValue }}</span>
     </template>
   </v-tooltip>
 </template>
@@ -15,10 +13,22 @@ import type { StandingsEntry } from "@/types";
 
 const props = defineProps<{
   entry: StandingsEntry;
+  baseEntry?: StandingsEntry;
   owners: boolean;
 }>();
 
 const { series } = useCurrentSeason();
+
+const displayValue = computed(() => {
+  const points = props.entry.playoffPointsToClinch;
+  const pointsBase = props.baseEntry?.playoffPointsToClinch;
+  if (points === null) return "";
+  if (points <= 0) {
+    if (pointsBase !== null && pointsBase !== undefined && pointsBase <= 0) return "Clinched";
+    else return "Will clinch";
+  }
+  return "+" + props.entry.playoffPointsToClinch;
+});
 
 const tooltipText = computed(() => {
   if (props.entry.playoffPointsToClinch === null || series.value === null) return "";

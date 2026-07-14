@@ -52,7 +52,7 @@
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">
-      <PointsToClinchDisplay :entry="item" :owners="owners" />
+      <PointsToClinchDisplay :entry="item" :base-entry="findBaseEntry(item)" :owners="owners" />
     </template>
 
     <template v-slot:item.starts="{ item }">
@@ -97,6 +97,13 @@ const calculatedEntries = computed(() => {
     props.liveStagePoints && props.projection,
   );
 });
+
+const calculatedEntriesWithoutProjection = computed(() => {
+  const liveEntries = useLivePointsCalculation(props.entries, false, props.liveStagePoints);
+  return usePlayoffCalculation(liveEntries, props.liveStagePoints?.length);
+});
+const findBaseEntry = (entry: StandingsEntry) =>
+  calculatedEntriesWithoutProjection.value.find((entry2) => entry2.entryId === entry.entryId);
 
 const anyEarnedPoints = computed(() =>
   calculatedEntries.value.some((entry) => entry.currentRacePoints || entry.projectedRacePoints),

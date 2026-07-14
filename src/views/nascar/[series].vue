@@ -17,8 +17,8 @@
 
     <div class="d-flex justify-center">
       <v-tabs v-if="currentlyInRace" v-model="selectedTab">
-        <v-tab>Current</v-tab>
-        <v-tab>Projected</v-tab>
+        <v-tab>Earned points</v-tab>
+        <v-tab>As they run</v-tab>
       </v-tabs>
     </div>
 
@@ -33,7 +33,7 @@
         <p class="my-1">
           <!-- TODO: get correct stage count -->
           <span v-if="selectedTab === 1"
-            >Based on running order at lap {{ liveRaceInfo.lap_number }}/{{
+            >Based on running order after lap {{ liveRaceInfo.lap_number }}/{{
               liveRaceInfo.laps_in_race
             }}</span
           ><span v-else>Points earned as of completion of stage {{ stagesComplete }}/3</span>, race
