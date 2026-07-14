@@ -44,7 +44,7 @@ export const usePlayoffCalculation = (
   for (const entry of standings) {
     const playoffEligible = eligibleEntries.includes(entry);
     const playoffPossible = entry.points + maximumPointsRemaining(1) >= cutoffPoints;
-    const pointsToCutline =
+    const deltaCutline =
       entry.points -
       (entry.position > playoffSpots ? cutoffPoints : standings[playoffSpots].points);
     let playoffClinched = false;
@@ -81,7 +81,7 @@ export const usePlayoffCalculation = (
       ...entry,
       playoffEligible,
       playoffPossible,
-      pointsToCutline,
+      deltaCutline,
       playoffClinched,
       playoffPointsToClinch,
       playoffDriversBeatenToClinch,

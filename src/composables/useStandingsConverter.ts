@@ -4,7 +4,7 @@ export const useStandingsConverter = () => {
   const baseEntry = {
     playoffEligible: false,
     playoffPossible: false,
-    pointsToCutline: 0,
+    deltaCutline: 0,
     playoffClinched: false,
     playoffPointsToClinch: 0,
     playoffDriversBeatenToClinch: 0,

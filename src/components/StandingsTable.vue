@@ -10,7 +10,11 @@
     hide-default-footer
   >
     <template v-slot:item.position="{ item }">
-      <PositionDisplay :current="item.position" :previous="item.previousPosition" />
+      <PositionDisplay
+        :current="item.position"
+        :previous="item.previousPosition"
+        :points="item.points"
+      />
     </template>
 
     <template v-slot:item.carNumber="{ item }">
@@ -22,7 +26,7 @@
         <span class="text-label-medium text-medium-emphasis">{{ item.name.first }}</span>
         <span class="text-title-medium mt-n1">{{ item.name.last }}</span>
       </div>
-      <span v-else class="text-body-medium">{{ item.name.full }}</span>
+      <span v-else class="text-body-medium">{{ item.name.full }} #{{ item.entryId }}</span>
     </template>
 
     <template v-slot:item.runningPosition="{ item }">
@@ -41,9 +45,9 @@
       <span v-else>&ndash;</span>
     </template>
 
-    <template v-slot:item.pointsToCutline="{ item }">
-      <span v-if="item.position <= (series?.playoff_spots ?? 0)">+{{ item.pointsToCutline }}</span>
-      <span v-else>&minus;{{ Math.abs(item.pointsToCutline) }}</span>
+    <template v-slot:item.deltaCutline="{ item }">
+      <span v-if="item.position <= (series?.playoff_spots ?? 0)">+{{ item.deltaCutline }}</span>
+      <span v-else>&minus;{{ Math.abs(item.deltaCutline) }}</span>
     </template>
 
     <template v-slot:item.deltaLeader="{ item }">
@@ -117,14 +121,14 @@ const tableHeaders = computed(() =>
     { title: "Pos", value: "position" },
     { title: "Num", value: "carNumber" },
     {
-      title: props.owners ? "Owner" : "Driver",
+      title: props.owners ? "Car" : "Driver",
       value: "name.full",
-      cellProps: { style: "max-width: 230px" },
+      cellProps: { style: "max-width: 200px" },
     },
     { title: "Points", value: "points" },
     { title: "Today", value: "projectedPoints", if: anyEarnedPoints },
     { title: "Running", value: "runningPosition", if: usingProjection },
-    { title: "Cutline", value: "pointsToCutline" },
+    { title: "Cutline", value: "deltaCutline" },
     { title: "Leader", value: "deltaLeader" },
     { title: "To Clinch", value: "playoffPointsToClinch" },
     { title: "Starts", value: "starts" },

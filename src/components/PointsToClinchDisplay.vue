@@ -23,11 +23,9 @@ const displayValue = computed(() => {
   const points = props.entry.playoffPointsToClinch;
   const pointsBase = props.baseEntry?.playoffPointsToClinch;
   if (points === null) return "";
-  if (points <= 0) {
-    if (pointsBase !== null && pointsBase !== undefined && pointsBase > 0) return "Will clinch";
-    else return "Clinched";
-  }
-  return "+" + props.entry.playoffPointsToClinch;
+  if (points > 0) return "+" + props.entry.playoffPointsToClinch;
+  if (pointsBase !== null && pointsBase !== undefined && pointsBase > 0) return "Will clinch";
+  else return "Clinched";
 });
 
 const tooltipText = computed(() => {

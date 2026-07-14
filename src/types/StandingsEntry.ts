@@ -15,7 +15,7 @@ export interface StandingsEntry {
 
   playoffEligible: boolean;
   playoffPossible: boolean;
-  pointsToCutline: number;
+  deltaCutline: number;
   playoffClinched: boolean;
   playoffPointsToClinch: number | null;
   playoffDriversBeatenToClinch: number | null;
