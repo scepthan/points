@@ -1,22 +1,19 @@
 <template>
   <v-container>
-    <h2>Points standings</h2>
+    <h2>Points standings and Chase clinch calculations</h2>
     <v-list>
-      <v-list-item>
-        <RouterLink :to="{ name: 'nascar', params: { series: 1, standings: 'drivers' } }">
-          NASCAR Cup Series
+      <v-list-item v-for="series in allSeries">
+        <RouterLink :to="{ name: 'nascar', params: { series: series.id, standings: 'drivers' } }">
+          {{ series.name }}
         </RouterLink>
-      </v-list-item>
-      <v-list-item>
-        <RouterLink :to="{ name: 'nascar', params: { series: 2, standings: 'drivers' } }">
-          NASCAR O'Reilly Auto Parts Series
-        </RouterLink>
-      </v-list-item>
-      <v-list-item>
-        <RouterLink :to="{ name: 'nascar', params: { series: 3, standings: 'drivers' } }">
-          NASCAR Craftsman Truck Series
-        </RouterLink>
+        (<RouterLink :to="{ name: 'nascar', params: { series: series.id, standings: 'owners' } }"
+          >owners</RouterLink
+        >)
       </v-list-item>
     </v-list>
   </v-container>
 </template>
+
+<script setup lang="ts">
+import { allSeries } from "@/assets";
+</script>
