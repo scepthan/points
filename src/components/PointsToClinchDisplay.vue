@@ -15,6 +15,7 @@ import type { StandingsEntry } from "@/types";
 
 const props = defineProps<{
   entry: StandingsEntry;
+  owners: boolean;
 }>();
 
 const { series } = useCurrentSeason();
@@ -38,10 +39,11 @@ const tooltipText = computed(() => {
   const lowPosition = cardinalNumber(
     series.value.playoff_spots + (driverCurrentlyInPlayoffs ? 1 : 0),
   );
+  const driverText = props.owners ? "car" : "driver";
   const driverCountText =
     driversToClinch === 1
-      ? `driver currently in ${lowPosition}`
-      : `${driversToClinch} ${driverWithinPositions ? "other " : ""} drivers currently in ${highPosition} to ${lowPosition}`;
+      ? `${driverText} currently in ${lowPosition}`
+      : `${driversToClinch} ${driverWithinPositions ? "other " : ""} ${driverText}s currently in ${highPosition} to ${lowPosition}`;
   const allText = driversToClinch === 1 ? "" : " all";
 
   const entryName =

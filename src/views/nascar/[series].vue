@@ -4,6 +4,12 @@
       <router-link :to="{ name: 'home' }">
         <v-icon class="mb-1">mdi-arrow-left</v-icon> Back to home
       </router-link>
+      <router-link
+        :to="{ name: 'nascar', params: { series: seriesId, standings: otherStandings } }"
+        @click="selectedStandings = otherStandings"
+      >
+        Switch to {{ otherStandings.slice(0, -1) }} standings
+      </router-link>
       <router-link :to="{ name: 'about' }">
         <v-icon class="mb-1">mdi-information-outline</v-icon> How does this work?
       </router-link>
@@ -16,11 +22,11 @@
       </v-tabs>
     </div>
 
-    <div v-if="seriesInfo && entries.length > 0">
+    <div v-if="seriesInfo && driverEntries.length > 0">
       <h1 class="my-1">
         <span v-if="currentlyInRace && selectedTab === 1">Projected </span
         ><span v-else-if="currentlyInRace && stagesComplete > 0">Unofficial </span
-        >{{ standingsYear }} {{ seriesInfo.name }} Driver Standings
+        >{{ standingsYear }} {{ seriesInfo.name }} {{ standingsDisplay }} Standings
       </h1>
 
       <div class="my-1" v-if="currentlyInRace && liveRaceInfo">
@@ -44,12 +50,15 @@
       <DriverStandingsTable
         :entries="entries"
         :projection="selectedTab === 1"
+        :owners="selectedStandings === 'owners'"
         :live-race-info="liveRaceInfo"
         :live-stage-points="liveStagePoints"
       />
     </div>
     <div v-else>
-      <p v-if="query.isError.value">Error loading points standings for series ID {{ seriesId }}.</p>
+      <p v-if="driversQuery.isError.value">
+        Error loading points standings for series ID {{ seriesId }}.
+      </p>
       <p v-else>Loading...</p>
     </div>
   </v-container>
@@ -57,23 +66,34 @@
 
 <script setup lang="ts">
 import { allSeries } from "@/assets";
-import { useCurrentSeason } from "@/composables";
+import { useCurrentSeason, useStandingsConverter } from "@/composables";
 import {
   useGetDriverStandingsQuery,
   useGetLiveRaceInfoQuery,
   useGetLiveStagePointsInfoQuery,
+  useGetOwnerStandingsQuery,
 } from "@/network";
 
+const converter = useStandingsConverter();
 const route = useRoute();
 const seriesId = computed(() => Number(route.params.series));
 const seriesInfo = computed(() => allSeries.find((s) => s.id === seriesId.value));
 
 const selectedTab = ref(Number(route.query.projected ?? 0));
+const selectedStandings = ref(route.params.standings === "owners" ? "owners" : "drivers");
+const otherStandings = computed(() =>
+  selectedStandings.value === "owners" ? "drivers" : "owners",
+);
+const standingsDisplay = computed(
+  () => selectedStandings.value[0].toUpperCase() + selectedStandings.value.slice(1, -1),
+);
 
-const query = useGetDriverStandingsQuery(seriesId.value);
-const entries = computed(() => query.entries.value ?? []);
+const driversQuery = useGetDriverStandingsQuery(seriesId.value);
+const driverEntries = computed(() => driversQuery.entries.value ?? []);
 
-const racesCompleted = computed(() => Math.max(...entries.value.map((entry) => entry.starts)));
+const racesCompleted = computed(() =>
+  Math.max(...driverEntries.value.map((entry) => entry.starts)),
+);
 const totalRaces = computed(() =>
   seriesInfo.value ? seriesInfo.value.regular_season_races + seriesInfo.value.playoff_races : 0,
 );
@@ -85,6 +105,14 @@ const standingsYear = computed(() => {
   }
   return currentYear;
 });
+const ownersQuery = useGetOwnerStandingsQuery(standingsYear.value, seriesId.value);
+const ownerEntries = computed(() => ownersQuery.entries.value ?? []);
+
+const entries = computed(() =>
+  selectedStandings.value === "owners"
+    ? converter.convertOwnerStandings(ownerEntries.value)
+    : converter.convertDriverStandings(driverEntries.value),
+);
 
 const currentSeason = useCurrentSeason();
 const updateCurrentSeason = () => {

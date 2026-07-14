@@ -22,7 +22,7 @@
         <span class="text-label-medium text-medium-emphasis">{{ item.name.first }}</span>
         <span class="text-title-medium mt-n1">{{ item.name.last }}</span>
       </div>
-      <span v-else>{{ item.name.full }}</span>
+      <span v-else class="text-body-medium">{{ item.name.full }}</span>
     </template>
 
     <template v-slot:item.runningPosition="{ item }">
@@ -52,7 +52,7 @@
     </template>
 
     <template v-slot:item.playoffPointsToClinch="{ item }">
-      <PointsToClinchDisplay :entry="item" />
+      <PointsToClinchDisplay :entry="item" :owners="owners" />
     </template>
 
     <template v-slot:item.starts="{ item }">
@@ -73,27 +73,20 @@ import {
   useCurrentSeason,
   useLivePointsCalculation,
   usePlayoffCalculation,
-  useStandingsConverter,
 } from "@/composables";
-import type {
-  DriverStandingsEntry,
-  LiveRaceInfo,
-  LiveStagePointsEntry,
-  StandingsEntry,
-} from "@/types";
+import type { LiveRaceInfo, LiveStagePointsEntry, StandingsEntry } from "@/types";
 
 const props = defineProps<{
-  entries: DriverStandingsEntry[];
+  entries: StandingsEntry[];
   projection: boolean;
+  owners: boolean;
   liveRaceInfo?: LiveRaceInfo;
   liveStagePoints?: LiveStagePointsEntry[];
 }>();
 
-const converter = useStandingsConverter();
-
 const calculatedEntries = computed(() => {
   const liveEntries = useLivePointsCalculation(
-    converter.convertDriverStandings(props.entries),
+    props.entries,
     props.projection,
     props.liveStagePoints,
     props.liveRaceInfo,
@@ -115,7 +108,11 @@ const tableHeaders = computed(() =>
   [
     { title: "Pos", value: "position" },
     { title: "Num", value: "carNumber" },
-    { title: "Driver", value: "name.full" },
+    {
+      title: props.owners ? "Owner" : "Driver",
+      value: "name.full",
+      cellProps: { style: "max-width: 230px" },
+    },
     { title: "Points", value: "points" },
     { title: "Today", value: "projectedPoints", if: anyEarnedPoints },
     { title: "Running", value: "runningPosition", if: usingProjection },
