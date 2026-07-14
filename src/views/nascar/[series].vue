@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import { allSeries } from "@/assets";
-import { useCurrentSeason, useStandingsConverter } from "@/composables";
+import { useCurrentSeason, useLastPage, useStandingsConverter } from "@/composables";
 import {
   useGetDriverStandingsQuery,
   useGetLiveRaceInfoQuery,
@@ -76,6 +76,9 @@ import {
 
 const converter = useStandingsConverter();
 const route = useRoute();
+const { lastPage } = useLastPage();
+lastPage.value = "nascar";
+
 const seriesId = computed(() => Number(route.params.series));
 const seriesInfo = computed(() => allSeries.find((s) => s.id === seriesId.value));
 

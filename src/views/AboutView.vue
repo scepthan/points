@@ -1,7 +1,12 @@
 <template>
   <v-container>
     <div class="my-2">
-      <router-link to="" @click="router.back()"> <v-icon>mdi-arrow-left</v-icon> Back </router-link>
+      <router-link v-if="lastPage" to="" @click="router.back()">
+        <v-icon>mdi-arrow-left</v-icon> Back
+      </router-link>
+      <router-link v-else :to="{ name: 'home' }">
+        <v-icon>mdi-arrow-left</v-icon> Back to home
+      </router-link>
     </div>
 
     <h2>How does a driver mathematically clinch a spot in the Chase?</h2>
@@ -99,7 +104,7 @@
       Sawalich, and Crews. By referencing the previous table, we find the maximum amount of points
       the four of them could possibly score in 7 races is 226 &times; 7 = 1582. Allgaier's combined
       gap to all four of these drivers comes out to +1616, meaning that it was impossible for all
-      four to overtake him, and he had indeed clinched a spot in the Chase with 7 races to go.
+      four to overtake him, and he had indeed clinched a spot in the Chase with 7 races to spare.
     </p>
 
     <h2>How is the points to clinch number calculated?</h2>
@@ -120,8 +125,9 @@
 
     <p>
       Now, start by calculating how many points the lowest driver out of these 16 could possibly
-      accumulate over the remainder of the regular season. If this is less than the amount of points
-      the chosen driver already has, then they are already clinched.
+      accumulate over the remainder of the regular season, by adding 76 &times; the number of races
+      remaining to their current total. If this is less than the amount of points the chosen driver
+      currently has, then they are already clinched.
     </p>
 
     <p>
@@ -135,10 +141,10 @@
     </p>
 
     <p>
-      By repeating this process with the bottom N drivers from N = 1 all the way up to N = 16 and
-      taking whichever result is smallest, a "lowest possible clinch amount" can be found, and the
-      "points to clinch" number is the difference between this amount and the number of points the
-      driver currently has.
+      By doing this with the bottom N drivers from N = 1 all the way up to N = 16 and taking
+      whichever result is smallest, a "lowest possible clinch amount" can be found, and the "points
+      to clinch" number is the difference between this amount and the number of points the driver
+      currently has.
     </p>
 
     <h2>
@@ -166,7 +172,10 @@
 </template>
 
 <script setup lang="ts">
+import { useLastPage } from "@/composables";
+
 const router = useRouter();
+const { lastPage } = useLastPage();
 
 const maximumPointsForPosition = (position: number) => {
   const basePoints = position === 1 ? 56 : 37 - position; // Including fastest lap point in 1st place points
