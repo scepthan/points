@@ -168,6 +168,70 @@
       watch the "earned points" tab throughout the race to see these numbers go down with each stage
       finish.
     </p>
+
+    <h2>Why has this math not been talked about in previous seasons?</h2>
+
+    <p>
+      Clinching a spot in the postseason has been a thing as long as the Chase/Playoffs have been
+      around, but the math has never really been difficult. In the Playoffs era in particular, it
+      was much easier to clinch a spot by simply winning a race than by earning points, and the
+      winless drivers in the top 16 were usually left fighting for the last few spots until the
+      final races of the regular season.
+    </p>
+
+    <p>
+      One big change to the math in 2026 is how many more points the winner earns proportionately to
+      second place. In the old Latford system era (up until 2010), the winner earned 180 or 185
+      points to the second-place driver's 170; this was changed to 43 vs 39 in 2011, then 40 vs 35
+      in 2016, with the 2017 addition of stage points increasing the maximum first- vs second-place
+      points to 60 vs 53. In all of these systems, it's barely worth considering whether it's
+      mathematically possible for multiple other drivers to simultaneously surpass you, because
+      unless you have a massive lead, you'll likely be locked in by your gap to the cutline alone.
+    </p>
+
+    <p>
+      That changed when it was announced that for 2026, the points for winning a race would be
+      increased from 40 to 55, without changing anything else about the points given out each
+      weekend. The win alone is now worth 57% more than finishing second, which means that while it
+      may still be possible for the driver in 17th to go on an incredible tear and surpass you in
+      the standings, it's entirely likely that there won't be enough points to go around for the
+      rest of the top 16 to do the same.
+    </p>
+
+    <p>
+      The last new factor in clinching a spot in the Chase in 2026 is the sheer number of drivers.
+      Never before have we had more than 12 drivers all fighting solely for points to make the
+      postseason. Jumping to 16 means there's more drivers to build a gap to if you're toward the
+      front of the field.
+    </p>
+
+    <p>
+      Lastly, previous online discussions of "early clinching" may have simply not survived the test
+      of time. There were definitely some people doing the math, as NASCAR was aware of the
+      possibility of early clinching in the original Chase years&mdash;such as when
+      <a
+        href="https://www.nascar.com/news-media/2013/08/15/chase-clinch-scenarios-for-michigan/"
+        target="_blank"
+        >Jimmie Johnson clinched with 4 races to spare in 2013</a
+      >
+      with a gap to 11th of +185, just shy of the +193 required for a direct clinch (granted, the
+      2011&ndash;2013 wild-card system means he may have technically been locked in a week or two
+      before that). It's possible that a website like this one existed back then, and it's now lost
+      in the aether or relegated to some obscure Wayback Machine snapshot.
+    </p>
+
+    <p>
+      If you have any information about previous work on NASCAR postseason clinching scenarios, or
+      just want to get in touch, feel free to message me on Reddit or Discord&mdash;my tag is
+      "scepthan" on both. Thanks for reading!
+    </p>
+
+    <div class="d-flex justify-end">
+      <span class="text-medium-emphasis">
+        &copy; Scepthan 2026 &bull; MIT License &bull;
+        <a href="https://github.com/scepthan/points" target="_blank">View code on GitHub</a>
+      </span>
+    </div>
   </v-container>
 </template>
 

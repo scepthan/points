@@ -15,7 +15,7 @@
     </v-list>
     <p>
       <router-link :to="{ name: 'about' }">
-        <v-icon class="mb-1">mdi-information-outline</v-icon> How does this work?
+        <v-icon class="mb-1">mdi-information-outline</v-icon> About
       </router-link>
     </p>
   </v-container>
