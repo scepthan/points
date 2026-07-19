@@ -1,8 +1,9 @@
 <template>
   <h5 class="my-1">
-    Live: lap {{ actualLapNumber }}/{{ info.laps_in_race }} ({{ stageLapsRemaining }} to go in stage
-    {{ info.stage.stage_num }}); {{ flagState }} at
-    {{ info.track_name }}
+    Live: {{ flagState }} at {{ info.track_name }}, lap {{ actualLapNumber }}/{{
+      info.laps_in_race
+    }}
+    ({{ stageLapsRemaining }} to go in stage {{ info.stage.stage_num }})
   </h5>
 </template>
 
@@ -13,8 +14,8 @@ const props = defineProps<{
   info: LiveRaceInfo;
 }>();
 
-const actualLapNumber = computed(
-  () => props.info.lap_number + (props.info.flag_state === 4 ? 0 : 1),
+const actualLapNumber = computed(() =>
+  props.info.flag_state === 8 ? 0 : props.info.lap_number + (props.info.flag_state >= 4 ? 0 : 1),
 );
 
 const stageLapsRemaining = computed(() => props.info.stage.finish_at_lap - props.info.lap_number);

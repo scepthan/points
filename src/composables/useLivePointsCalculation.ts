@@ -32,7 +32,11 @@ export const useLivePointsCalculation = (
     stagesWon: [],
     previousPosition: entry.position,
   }));
-  if (!liveStageInfo) return updatedEntries;
+  if (!liveStageInfo) {
+    if (!calcProjection) return updatedEntries;
+    liveStageInfo = [];
+  }
+
   // TODO: account for Coca-Cola 600
   const stagesRemaining = Math.max(0, 2 - liveStageInfo.length);
 
