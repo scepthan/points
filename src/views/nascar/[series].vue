@@ -49,7 +49,7 @@
       </p>
       <StandingsTable
         :entries="entries"
-        :projection="selectedTab === 1"
+        :projection="useProjection"
         :owners="selectedStandings === 'owners'"
         :live-race-info="liveRaceInfo"
         :live-stage-points="liveStagePoints"
@@ -111,20 +111,18 @@ const standingsYear = computed(() => {
 const ownersQuery = useGetOwnerStandingsQuery(standingsYear.value, seriesId.value);
 const ownerEntries = computed(() => ownersQuery.entries.value ?? []);
 
+const useProjection = computed(
+  () =>
+    selectedTab.value === 1 ||
+    (selectedStandings.value === "owners" &&
+      Math.max(...ownerEntries.value.map((e) => e.starts)) < racesCompleted.value),
+);
+
 const entries = computed(() =>
   selectedStandings.value === "owners"
     ? converter.convertOwnerStandings(ownerEntries.value)
     : converter.convertDriverStandings(driverEntries.value),
 );
-
-const currentSeason = useCurrentSeason();
-const updateCurrentSeason = () => {
-  currentSeason.series.value = seriesInfo.value ?? null;
-  currentSeason.season.value = standingsYear.value;
-  currentSeason.racesCompleted.value = racesCompleted.value;
-};
-updateCurrentSeason();
-watch([seriesInfo, standingsYear, racesCompleted], updateCurrentSeason);
 
 const liveRaceQuery = useGetLiveRaceInfoQuery();
 const currentlyInRace = computed(
@@ -133,9 +131,21 @@ const currentlyInRace = computed(
     liveRaceQuery.liveRaceInfo.value.run_type === 3 &&
     liveRaceQuery.liveRaceInfo.value.flag_state !== 9,
 );
+const racesStarted = computed(() => racesCompleted.value + (currentlyInRace.value ? 1 : 0));
+
+const currentSeason = useCurrentSeason();
+const updateCurrentSeason = () => {
+  currentSeason.series.value = seriesInfo.value ?? null;
+  currentSeason.season.value = standingsYear.value;
+  currentSeason.racesCompleted.value = racesCompleted.value;
+  currentSeason.racesStarted.value = racesStarted.value;
+};
+updateCurrentSeason();
+watch([seriesInfo, standingsYear, racesCompleted, racesStarted], updateCurrentSeason);
+
 // Only propagate live info if it's for an active points race in this series
 const liveRaceInfo = computed(() =>
-  currentlyInRace.value ? liveRaceQuery.liveRaceInfo.value : undefined,
+  currentlyInRace.value || useProjection.value ? liveRaceQuery.liveRaceInfo.value : undefined,
 );
 const raceId = ref(liveRaceInfo.value?.race_id ?? 0);
 

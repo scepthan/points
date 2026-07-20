@@ -95,6 +95,7 @@ export const useLivePointsCalculation = (
       }
     }
 
+    entry.starts += 1;
     entry.currentRacePoints = currentRacePoints;
     entry.projectedRacePoints = projectedRacePoints;
     entry.points += currentRacePoints + projectedRacePoints;

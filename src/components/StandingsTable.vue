@@ -137,15 +137,15 @@ const tableHeaders = computed(() =>
   ].filter((header) => (header.if !== undefined ? unref(header.if) : true)),
 );
 
-const { racesCompleted, series } = useCurrentSeason();
+const { racesStarted, series } = useCurrentSeason();
 
 const playoffCutoffClass = (entry: StandingsEntry) => {
-  if (series.value === null || racesCompleted.value === null) return {};
+  if (series.value === null || racesStarted.value === null) return {};
 
   const classes = [];
   if (entry.position === series.value.playoff_spots) {
     classes.push(
-      racesCompleted.value < series.value.regular_season_races
+      racesStarted.value < series.value.regular_season_races
         ? "playoff-cutoff-upcoming"
         : "playoff-cutoff",
     );

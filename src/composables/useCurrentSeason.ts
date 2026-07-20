@@ -4,6 +4,7 @@ import type { SeriesInfo } from "@/types";
 const series = ref<SeriesInfo | null>(null);
 const season = ref<number | null>(null);
 const racesCompleted = ref<number | null>(null);
+const racesStarted = ref<number | null>(null);
 
 const getDriverWaiver = (driverName: string) => {
   if (!series.value || !season.value) return undefined;
@@ -20,6 +21,7 @@ export const useCurrentSeason = () => {
     series,
     season,
     racesCompleted,
+    racesStarted,
     getDriverWaiver,
   };
 };
