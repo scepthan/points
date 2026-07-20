@@ -1,4 +1,4 @@
-import { allWaivers } from "@/assets";
+import { allDnqs, allWaivers } from "@/assets";
 import type { SeriesInfo } from "@/types";
 
 const series = ref<SeriesInfo | null>(null);
@@ -15,6 +15,15 @@ const getDriverWaiver = (driverName: string) => {
       waiver.year === season.value,
   );
 };
+const getCarDnqs = (entryNumber: string) => {
+  if (!series.value || !season.value) return undefined;
+  return allDnqs.find(
+    (waiver) =>
+      waiver.entry_no === entryNumber &&
+      waiver.series_id === series.value!.id &&
+      waiver.year === season.value,
+  );
+};
 
 export const useCurrentSeason = () => {
   return {
@@ -23,5 +32,6 @@ export const useCurrentSeason = () => {
     racesCompleted,
     racesStarted,
     getDriverWaiver,
+    getCarDnqs,
   };
 };

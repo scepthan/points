@@ -33,12 +33,15 @@ export const usePlayoffCalculation = (
   const playoffSpots = series.playoff_spots;
   const cutoffPoints = standings[playoffSpots - 1].points;
 
-  const eligibleEntries = standings.filter(
-    (entry) =>
-      entry.starts === racesCompleted ||
-      (entry.name.type === "driver" &&
-        currentSeason.getDriverWaiver(entry.name.full) !== undefined),
-  );
+  const eligibleEntries = standings.filter((entry) => {
+    if (entry.starts === racesCompleted) return true;
+
+    if (entry.name.type === "driver")
+      return currentSeason.getDriverWaiver(entry.name.full) !== undefined;
+
+    const dnqs = currentSeason.getCarDnqs(entry.carNumber);
+    return dnqs !== undefined && dnqs.dnqs + entry.starts === racesCompleted;
+  });
 
   const calculated = [];
   for (const entry of standings) {
