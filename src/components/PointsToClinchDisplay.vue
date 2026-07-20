@@ -61,7 +61,7 @@ const tooltipText = computed(() => {
 
   if (props.entry.playoffClinched) {
     return (
-      `The ${driverCountText} cannot${allText} surpass ${totalPointsToClinch} points,` +
+      `The ${driverCountText} cannot${allText} surpass ${totalPointsToClinch - 1} points,` +
       ` meaning ${entryName} has clinched a Chase spot.`
     );
   }
