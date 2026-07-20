@@ -67,7 +67,7 @@ export const usePlayoffCalculation = (
         );
         if (highestPossibleCutoff < lowestHighestPossibleCutoff) {
           lowestHighestPossibleCutoff = highestPossibleCutoff;
-          playoffPointsToClinch = highestPossibleCutoff - entry.points;
+          playoffPointsToClinch = highestPossibleCutoff + 1 - entry.points;
           playoffDriversBeatenToClinch = i;
           if (entry.points >= highestPossibleCutoff) {
             playoffClinched = true;
